@@ -9,6 +9,9 @@ TARGET_MODEL_ID = "model-carousel-row-models/gemini-2.5-pro"
 TARGET_SYSTEM_PROMPT = "transcriptor"
 TEMP_DIR = "temp" 
 
+# SAFETY FLAGS
+ENABLE_STABILITY_CHECK = False  # Set to False to skip the "text growing" check
+
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 class AIStudioBot:
@@ -40,8 +43,8 @@ class AIStudioBot:
         try: self.page.wait_for_load_state("networkidle", timeout=10000)
         except: pass
 
-    def select_model(self):
-        print(f"🤖 Bot: Checking Model ({TARGET_MODEL_NAME})...")
+    def select_model(self, target_name=TARGET_MODEL_NAME, target_id=TARGET_MODEL_ID):
+        print(f"🤖 Bot: Checking Model ({target_name})...")
         try:
             card = self.page.locator(".model-selector-card").first
             try: card.wait_for(state="visible", timeout=8000)
@@ -51,8 +54,8 @@ class AIStudioBot:
                 print("   ⚠️ Model card not visible. Proceeding blindly...")
             else:
                 current_text = card.text_content().strip()
-                if TARGET_MODEL_NAME in current_text:
-                    print(f"   ✅ Already on {TARGET_MODEL_NAME}.")
+                if target_name in current_text:
+                    print(f"   ✅ Already on {target_name}.")
                     return
                 
                 print("   Switching Model...")
@@ -63,13 +66,13 @@ class AIStudioBot:
                     all_btn.click()
                 except: pass
 
-                model_btn = self.page.locator(f'button[id="{TARGET_MODEL_ID}"]')
+                model_btn = self.page.locator(f'button[id="{target_id}"]')
                 if model_btn.count() > 0:
                     model_btn.scroll_into_view_if_needed()
                     model_btn.click(timeout=5000)
-                    print(f"   ✅ Switched to {TARGET_MODEL_NAME}")
+                    print(f"   ✅ Switched to {target_name}")
                 else:
-                    print(f"   ⚠️ {TARGET_MODEL_NAME} ID not found.")
+                    print(f"   ⚠️ {target_name} ID not found.")
                 
                 try: self.page.get_by_label("Close panel").click(timeout=2000)
                 except: pass
@@ -137,47 +140,49 @@ class AIStudioBot:
                 run_btn.click(force=True)
 
             print("⏳ Waiting for generation...")
+            # Wait for Start
             for _ in range(20):
                 if self.page.get_by_label("Stop generation").count() > 0: break
                 time.sleep(1)
             
+            # Wait for Stop button to vanish
             while self.page.get_by_label("Stop generation").count() > 0:
                 time.sleep(2)
             
-            print("   Stop button gone. Verifying text stability...")
-            
+            # --- STABILITY CHECK ---
+            # Locate the wrapper first
             last_model_turn = self.page.locator("ms-chat-turn").filter(
                 has=self.page.locator("[data-turn-role='Model']")
             ).last
             last_model_turn.wait_for(state="visible", timeout=30000)
-            
-            # --- HIGH SPEED STABILITY CHECK ---
-            prev_len = 0
-            stable_count = 0
-            
-            # Max wait: 60 seconds (120 checks * 0.5s)
-            for _ in range(120): 
-                # Force scroll to keep DOM active
-                try: last_model_turn.scroll_into_view_if_needed()
-                except: pass
 
-                curr_text = last_model_turn.inner_text()
-                curr_len = len(curr_text)
+            if ENABLE_STABILITY_CHECK:
+                print("   Verifying text stability (Flag: ON)...")
+                prev_len = 0
+                stable_count = 0
                 
-                # Check stability
-                if curr_len == prev_len and curr_len > 10:
-                    stable_count += 1
-                else:
-                    stable_count = 0 # Reset if text grew
-                
-                # Threshold: 5 checks * 0.5s = 2.5 seconds of silence
-                if stable_count >= 5:
-                    print("   ✅ Text stabilized.")
-                    break
-                
-                prev_len = curr_len
-                time.sleep(0.5) # Fast polling
+                for _ in range(120): 
+                    try: last_model_turn.scroll_into_view_if_needed()
+                    except: pass
 
+                    curr_text = last_model_turn.inner_text()
+                    curr_len = len(curr_text)
+                    
+                    if curr_len == prev_len and curr_len > 10:
+                        stable_count += 1
+                    else:
+                        stable_count = 0
+                    
+                    if stable_count >= 5: # 2.5 seconds stability
+                        print("   ✅ Text stabilized.")
+                        break
+                    
+                    prev_len = curr_len
+                    time.sleep(0.5)
+            else:
+                print("   ⚠️ Stability check skipped (Flag: OFF).")
+
+            # COPY
             print("   Extracting text via Copy Menu...")
             final_text = ""
             try:
@@ -218,9 +223,8 @@ if __name__ == "__main__":
         if not os.path.exists(test_file):
             with open(test_file, "w") as f: f.write("dummy content")
         
+        # Saves to temp/test.txt
         text, path = bot.upload_and_transcribe(test_file)
-        if path:
-            print(f"\n--- DONE ---")
-            
+        
     except Exception as e:
         print(f"CRASH: {e}")

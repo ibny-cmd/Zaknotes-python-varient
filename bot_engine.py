@@ -103,7 +103,14 @@ class AIStudioBot:
             option.click()
             
             print(f"   ✅ Selected: {instruction_name}")
-            
+
+            # Explicitly close the sidebar after selection
+            try:
+                self.page.locator('button[aria-label="Close panel"]').click(timeout=2000)
+                print("   Closed system prompt panel.")
+            except Exception as e:
+                print(f"   Note: Could not explicitly close system prompt panel: {e}")
+
         except Exception as e:
             print(f"   ❌ System Instruction selection error: {e}")
             raise
@@ -119,15 +126,24 @@ class AIStudioBot:
         output_path = os.path.join(TEMP_DIR, output_filename)
 
         print(f"🤖 Bot: Uploading {filename}...")
-        
+
         try:
+            # 1. Open Menu
             print("   Clicking '+' to load menu...")
+            # From: ui_elements/add_media_popup_button.html
             self.page.locator('button[data-test-id="add-media-button"]').click()
-            
+
+            # 2. TARGET HIDDEN INPUT
+            # From: ui_elements/upload_file_button_in_add_media_popup.html
             print("   Targeting hidden input...")
             file_input = self.page.locator("input[data-test-upload-file-input]")
+            # Direct injection avoids OS file picker
             file_input.set_input_files(audio_path, timeout=60000)
             print("   ✅ File injected successfully.")
+
+            # Press escape to close the media menu and prevent interception
+            self.page.keyboard.press("Escape")
+            print("   Pressed 'Escape' to close media popup.")
 
             print("   Waiting for 'Run'...")
             run_btn = self.page.locator('ms-run-button button[aria-label="Run"]').first

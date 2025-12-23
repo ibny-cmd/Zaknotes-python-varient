@@ -4,6 +4,7 @@ from playwright.sync_api import sync_playwright
 
 class PdfConverter:
     def __init__(self):
+        # The CSS path is relative to this file
         self.style_css_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "pdf_converter", "style.css"))
 
     def convert_md_to_html(self, md_file_path, output_html_path):
@@ -29,26 +30,28 @@ class PdfConverter:
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Pandoc conversion failed: {e.stderr}")
 
-    def convert_html_to_pdf(self, html_file_path, output_pdf_path):
+    def convert_html_to_pdf(self, html_file_path, output_pdf_path, playwright_instance=None):
         """
         Converts an HTML file to PDF using Playwright's headless Chromium.
+        Allows passing an existing Playwright instance to avoid asyncio loop conflicts.
         """
         if not os.path.exists(html_file_path):
             raise FileNotFoundError(f"HTML file not found: {html_file_path}")
 
-        # Convert to absolute path to prevent invalid URL errors
         absolute_html_path = os.path.abspath(html_file_path)
 
-        with sync_playwright() as p:
+        def _run_conversion(p):
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-
-            # Go to the HTML file (local file access)
             page.goto(f"file://{absolute_html_path}")
-
-            # CSS is now handled by Pandoc, so no need to inject it here.
-
             # Generate PDF
             page.pdf(path=output_pdf_path, format="A4")
-
             browser.close()
+
+        if playwright_instance:
+            # Reuse existing instance
+            _run_conversion(playwright_instance)
+        else:
+            # Start a new one
+            with sync_playwright() as p:
+                _run_conversion(p)

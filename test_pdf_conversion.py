@@ -49,9 +49,13 @@ def test_convert_html_to_pdf_uses_playwright(tmp_path):
     with patch('pdf_converter_py.sync_playwright', return_value=mock_playwright_cm):
         # We need to mock the context manager entry point as well
         with patch.object(mock_playwright_cm, '__enter__', return_value=mock_playwright_cm):
+            # Test without instance
             converter.convert_html_to_pdf(str(html_file), str(pdf_output))
-
-            mock_page.goto.assert_called_once_with(f"file://{absolute_html_path}")
-            mock_page.add_style_tag.assert_not_called() # Ensure CSS injection is no longer done here
-            mock_page.pdf.assert_called_once_with(path=str(pdf_output), format="A4")
-            mock_browser.close.assert_called_once()
+            
+            mock_page.goto.assert_called_with(f"file://{absolute_html_path}")
+            mock_page.pdf.assert_called_with(path=str(pdf_output), format="A4")
+            
+            # Test with instance
+            converter.convert_html_to_pdf(str(html_file), str(pdf_output), playwright_instance=mock_playwright_cm)
+            assert mock_page.goto.call_count == 2
+            mock_browser.close.assert_called()

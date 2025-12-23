@@ -10,32 +10,34 @@ def mock_bot_deps():
         driver_instance = MockDriver.return_value
         mock_page = MagicMock()
         driver_instance.page = mock_page
-        yield driver_instance, mock_page
+        mock_playwright = MagicMock()
+        driver_instance.playwright = mock_playwright
+        yield driver_instance, mock_page, mock_playwright
 
 @pytest.fixture
-def mock_pdf_deps():
-    with patch('pdf_converter_py.sync_playwright') as mock_sync_playwright, \
-         patch('subprocess.run') as mock_run:
-        
-        mock_sync_playwright_cm = MagicMock()
-        mock_playwright = MagicMock()
+def mock_pdf_deps(mock_bot_deps):
+    driver_instance, bot_page, mock_playwright = mock_bot_deps
+    # Patch subprocess.run globally
+    with patch('subprocess.run') as mock_run:
+        # We don't patch sync_playwright here because bot_engine will pass its own instance
+        # But we need to mock the behavior of that instance (mock_playwright)
         mock_browser = MagicMock()
         mock_page = MagicMock()
-
-        mock_sync_playwright.return_value = mock_sync_playwright_cm
-        mock_sync_playwright_cm.__enter__.return_value = mock_playwright
+        
         mock_playwright.chromium.launch.return_value = mock_browser
         mock_browser.new_page.return_value = mock_page
         
         yield mock_run, mock_page
 
 def test_full_pipeline_integration(mock_bot_deps, mock_pdf_deps, tmp_path):
-    driver_instance, bot_page = mock_bot_deps
+    driver_instance, bot_page, mock_playwright = mock_bot_deps
     mock_run, pdf_page = mock_pdf_deps
     
-    # 1. Bot Engine Mocking
+    # 1. Bot Engine Setup
     bot = AIStudioBot()
     bot.page = bot_page
+    # Ensure bot uses the same driver instance
+    bot.driver = driver_instance
     
     m = MagicMock()
     m.is_enabled.return_value = True
@@ -53,22 +55,16 @@ def test_full_pipeline_integration(mock_bot_deps, mock_pdf_deps, tmp_path):
     audio_path = tmp_path / "test.mp3"
     audio_path.write_text("dummy audio")
     
+    # Execution
     with patch('os.path.exists', return_value=True), \
          patch('builtins.open', MagicMock()):
-        md_text, md_path = bot.generate_notes(str(audio_path))
-    
-    assert md_text == "# Integrated Test Content"
-    
-    # 2. PDF Conversion Mocking
-    converter = PdfConverter()
-    html_path = md_path.replace(".md", ".html")
-    pdf_path = md_path.replace(".md", ".pdf")
-    
-    with patch('os.path.exists', return_value=True):
-        converter.convert_md_to_html(md_path, html_path)
-        converter.convert_html_to_pdf(html_path, pdf_path)
+        md_text, pdf_path = bot.generate_notes(str(audio_path))
     
     # Verifications
-    mock_run.assert_called_once() # Pandoc called
-    pdf_page.goto.assert_called_once() # Playwright called
+    assert md_text == "# Integrated Test Content"
+    assert pdf_path.endswith(".pdf")
+    
+    # Verify PDF Conversion components were triggered
+    mock_run.assert_called_once() # Pandoc called once via bot.generate_notes
+    pdf_page.goto.assert_called_once() # Playwright goto called
     pdf_page.pdf.assert_called_once() # PDF generated

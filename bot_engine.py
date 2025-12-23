@@ -206,7 +206,7 @@ class AIStudioBot:
             pdf_path = output_path.replace(".md", ".pdf")
             
             self.converter.convert_md_to_html(output_path, html_path)
-            self.converter.convert_html_to_pdf(html_path, pdf_path)
+            self.converter.convert_html_to_pdf(html_path, pdf_path, playwright_instance=self.driver.playwright)
             
             print(f"   ✅ PDF saved to: {pdf_path}")
             

@@ -6,9 +6,9 @@
 - [~] Task: Conductor - User Manual Verification 'Cleanup & Setup' (Protocol in workflow.md)
 
 ## Phase 2: Bot Engine - Foundation & Selection
-- [ ] Task: Write Tests: Browser connection and model/instruction selection
-- [ ] Task: Refactor `browser_driver.py` and `bot_engine.py` for reliable connection and fresh chat navigation
-- [ ] Task: Implement model and system instruction selection using `ui_elements/` selectors
+- [x] Task: Write Tests: Browser connection and model/instruction selection [98b02ec]
+- [x] Task: Refactor `browser_driver.py` and `bot_engine.py` for reliable connection and fresh chat navigation [98b02ec]
+- [x] Task: Implement model and system instruction selection using `ui_elements/` selectors [98b02ec]
 - [ ] Task: Conductor - User Manual Verification 'Bot Engine Foundation' (Protocol in workflow.md)
 
 ## Phase 3: Bot Engine - Upload & Extraction

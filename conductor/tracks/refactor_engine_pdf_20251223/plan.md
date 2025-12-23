@@ -18,9 +18,9 @@
 - [~] Task: Conductor - User Manual Verification 'Bot Engine Upload & Extraction' (Protocol in workflow.md)
 
 ## Phase 4: Python-Native PDF Conversion
-- [ ] Task: Write Tests: MD to HTML and HTML to PDF conversion
-- [ ] Task: Implement MD to HTML conversion using Pandoc
-- [ ] Task: Implement HTML to PDF conversion using Playwright Python `page.pdf()` with CSS injection
+- [x] Task: Write Tests: MD to HTML and HTML to PDF conversion [2ff6947]
+- [x] Task: Implement MD to HTML conversion using Pandoc [2ff6947]
+- [x] Task: Implement HTML to PDF conversion using Playwright Python `page.pdf()` with CSS injection [2ff6947]
 - [ ] Task: Conductor - User Manual Verification 'PDF Conversion' (Protocol in workflow.md)
 
 ## Phase 5: Integration & Final Polish

@@ -11,11 +11,11 @@
 - [x] Task: Implement model and system instruction selection using `ui_elements/` selectors [98b02ec]
 - [~] Task: Conductor - User Manual Verification 'Bot Engine Foundation' (Protocol in workflow.md)
 
-## Phase 3: Bot Engine - Upload & Extraction
+## Phase 3: Bot Engine - Upload & Extraction [checkpoint: a6c9900]
 - [x] Task: Write Tests: File upload and clean Markdown extraction [2b41bd7]
 - [x] Task: Implement robust file upload via direct DOM injection [2b41bd7]
 - [x] Task: Implement completion verification and clean extraction using "Copy as Markdown" flow [2b41bd7]
-- [ ] Task: Conductor - User Manual Verification 'Bot Engine Upload & Extraction' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Bot Engine Upload & Extraction' (Protocol in workflow.md)
 
 ## Phase 4: Python-Native PDF Conversion
 - [ ] Task: Write Tests: MD to HTML and HTML to PDF conversion

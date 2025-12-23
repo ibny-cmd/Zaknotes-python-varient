@@ -1,9 +1,9 @@
 # Plan: Refactor Bot Engine & PDF Conversion
 
-## Phase 1: Repository Cleanup & Setup
+## Phase 1: Repository Cleanup & Setup [checkpoint: 7835346]
 - [x] Task: Cleanup obsolete files and artifacts [199dfd5]
 - [x] Task: Initialize testing environment (pytest) and update dependencies [e23c920]
-- [ ] Task: Conductor - User Manual Verification 'Cleanup & Setup' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Cleanup & Setup' (Protocol in workflow.md)
 
 ## Phase 2: Bot Engine - Foundation & Selection
 - [ ] Task: Write Tests: Browser connection and model/instruction selection

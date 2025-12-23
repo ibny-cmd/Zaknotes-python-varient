@@ -1,5 +1,7 @@
 from browser_driver import BrowserDriver
 from pdf_converter_py import PdfConverter
+from job_manager import JobManager
+from downloader import download_audio
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import time
 import os
@@ -181,7 +183,7 @@ class AIStudioBot:
             ).last
             last_model_turn.wait_for(state="visible", timeout=30000)
 
-            last_model_turn.hover() 
+            last_model_turn.hover()
             
             more_btn = last_model_turn.locator("button[aria-label='Open options']").first
             more_btn.click()
@@ -219,32 +221,55 @@ class AIStudioBot:
     def close(self):
         self.driver.close()
 
-def process_single_file(bot, audio_path):
+def process_job(bot, job_manager, job):
+    """Processes a single job: download -> transcribe -> PDF"""
     try:
+        # Update status to downloading
+        job['status'] = 'downloading'
+        job_manager.save_history()
+        
+        # Phase 2: Download
+        audio_path = download_audio(job)
+        
+        # Update status to processing
+        job['status'] = 'processing'
+        job_manager.save_history()
+        
+        # Phase 3: AI Studio Automation
         bot.ensure_connection()
         bot.select_model()
         bot.select_system_instruction()
         
         text, pdf_path = bot.generate_notes(audio_path)
+        
         if pdf_path:
-            print(f"\n✨ SUCCESSFULLY PROCESSED: {os.path.basename(audio_path)}")
-            return True
+            job['status'] = 'completed'
+            job['pdf_path'] = pdf_path
+            print(f"\n✨ SUCCESSFULLY COMPLETED: {job['name']}")
+        else:
+            job['status'] = 'failed'
+            print(f"\n❌ FAILED DURING GENERATION: {job['name']}")
+            
     except Exception as e:
-        print(f"❌ FAILED TO PROCESS {audio_path}: {e}")
-    return False
+        job['status'] = 'failed'
+        job['error'] = str(e)
+        print(f"❌ CRITICAL JOB ERROR ({job['name']}): {e}")
+    
+    job_manager.save_history()
 
 if __name__ == "__main__":
-    bot = AIStudioBot()
-    try:
-        real_files = glob.glob(os.path.join(DOWNLOAD_DIR, "*.mp3"))
-        if not real_files:
-            print(f"❌ No mp3 files found in {DOWNLOAD_DIR}")
-        else:
-            print(f"📂 Found {len(real_files)} files to process.")
-            for audio_file in real_files:
-                process_single_file(bot, audio_file)
-                # Small delay between files
-                time.sleep(2)
-            
-    finally:
-        bot.close()
+    job_manager = JobManager()
+    pending_jobs = job_manager.get_pending_from_last_150()
+    
+    if not pending_jobs:
+        print("📭 No pending jobs in queue.")
+    else:
+        print(f"📂 Found {len(pending_jobs)} pending jobs to process.")
+        bot = AIStudioBot()
+        try:
+            for job in pending_jobs:
+                process_job(bot, job_manager, job)
+                # Small delay between jobs
+                time.sleep(3)
+        finally:
+            bot.close()

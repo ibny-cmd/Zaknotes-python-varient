@@ -25,7 +25,7 @@ This plan outlines the steps to reorganize the Zaknotes codebase, clean up legac
 - [x] **Task 1: Implement Menu Framework** af64537
   - **Write Tests**: Define tests for the CLI menu structure and user input handling.
   - **Implement**: Create `zaknotes.py` in the root with a loop that displays the 3 options and handles exit.
-- [ ] **Task 2: Integrate Option 1 - Start Note Generation**
+- [x] **Task 2: Integrate Option 1 - Start Note Generation** 0845517
   - **Implement**: Link the "Process Videos" menu option to the existing logic in `src/job_manager.py`.
 - [ ] **Task 3: Implement Option 2 - Refresh Browser Profile**
   - **Write Tests**: Define tests for directory deletion and browser launch triggers.

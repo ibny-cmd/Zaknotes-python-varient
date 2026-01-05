@@ -10,10 +10,8 @@ This plan outlines the refactoring of `zaknotes.py` to include a job management 
 - [x] **Task: Conductor - User Manual Verification 'Job Manager Logic Enhancements' (Protocol in workflow.md)** ebe7581
 
 ## Phase 2: CLI Menu Refactoring
-- [ ] **Task 1: Implement "Launch Browser" (Option 4)**
-  - **Write Tests**: Define a test to ensure the browser launch command is triggered correctly from the menu.
-  - **Implement**: Add Option 4 to `zaknotes.py`. Use `BrowserDriver` to launch the instance and add a blocking `input()` to keep it open.
-- [ ] **Task 2: Shift "Exit" to Option 5**
+- [x] **Task 1: Implement "Launch Browser" (Option 4)** 456a992
+- [x] **Task 2: Shift "Exit" to Option 5** 456a992
   - **Implement**: Update the menu loop and conditional logic in `zaknotes.py`.
 - [ ] **Task: Conductor - User Manual Verification 'CLI Menu Refactoring' (Protocol in workflow.md)**
 

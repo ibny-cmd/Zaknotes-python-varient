@@ -30,7 +30,7 @@ This plan outlines the steps to reorganize the Zaknotes codebase, clean up legac
 - [x] **Task 3: Implement Option 2 - Refresh Browser Profile** f2c9125
   - **Write Tests**: Define tests for directory deletion and browser launch triggers.
   - **Implement**: Add logic to `zaknotes.py` to delete `browser_profile/` and launch a non-headless browser via `browser_driver.py`.
-- [ ] **Task 4: Integrate Option 3 - Refresh Cookies**
+- [x] **Task 4: Integrate Option 3 - Refresh Cookies** df2011e
   - **Implement**: Link the "Refresh Cookies" menu option to `src/cookie_manager.py`.
 - [ ] **Task: Conductor - User Manual Verification 'Unified CLI Implementation' (Protocol in workflow.md)**
 

@@ -37,14 +37,10 @@ class JobManager:
         return pending
 
     def cancel_pending(self):
-        """Option 1: Cancel all pending jobs in the check range"""
-        pending = self.get_pending_from_last_150()
-        for job in pending:
-            # Find the actual job in the main list and update
-            # We use the unique ID to find it
-            for h_job in self.history:
-                if h_job['id'] == job['id']:
-                    h_job['status'] = 'cancelled'
+        """Cancel ALL pending jobs in history"""
+        for job in self.history:
+            if job.get('status') == 'queue':
+                job['status'] = 'cancelled'
         self.save_history()
 
     def smart_split(self, text):

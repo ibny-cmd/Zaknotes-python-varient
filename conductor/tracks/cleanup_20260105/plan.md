@@ -35,9 +35,9 @@ This plan outlines the steps to reorganize the Zaknotes codebase, clean up legac
 - [x] **Task: Conductor - User Manual Verification 'Unified CLI Implementation' (Protocol in workflow.md)** 299b5de
 
 ## Phase 3: Final Integration & QA
-- [ ] **Task 1: End-to-End Flow Verification**
+- [x] **Task 1: End-to-End Flow Verification** 299b5de
   - Manually verify that a full "Note Generation" run works as expected from the new `zaknotes.py` entry point.
-- [ ] **Task 2: Documentation & Cleanup**
+- [x] **Task 2: Documentation & Cleanup** 299b5de
   - Ensure any README instructions are updated (if applicable).
   - Perform a final check for any lingering unused files.
 - [ ] **Task: Conductor - User Manual Verification 'Final Integration & QA' (Protocol in workflow.md)**

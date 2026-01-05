@@ -1,52 +1,34 @@
 # Virtual Environment
+.venv/
 venv/
 env/
 ENV/
-.venv
 
 # Python
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# Testing
-.pytest_cache/
+# Data/State (Ignore content but keep directory)
+downloads/*
+!downloads/.gitkeep
+temp/*
+!temp/.gitkeep
+cookies/*
+!cookies/.gitkeep
+browser_profile/
+history.json
 .coverage
-htmlcov/
+.pytest_cache/
 
-# IDE
+# Resources (Requested to be ignored)
+src/ui_elements/
+
+# IDE/System
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 .DS_Store
-
-# Environment variables
-.env
-.env.local
-
-
-downloads/
-
-cookies/
-browser_profile/
-temp/
-src/ui_elements/
+*.swp
+*~

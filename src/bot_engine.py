@@ -259,6 +259,9 @@ def process_job(bot, job_manager, job):
 
 if __name__ == "__main__":
     job_manager = JobManager()
+    file_names = input("Give me the file names: ")
+    urls = input("Give the URLS for the files: ")
+    job_manager.add_jobs(file_names, urls)
     pending_jobs = job_manager.get_pending_from_last_150()
     
     if not pending_jobs:

@@ -2,7 +2,7 @@
 
 This plan outlines the steps to reorganize the Zaknotes codebase, clean up legacy files, and implement a unified CLI entry point.
 
-## Phase 1: Project Structure Reorganization
+## Phase 1: Project Structure Reorganization [checkpoint: b71252d]
 - [x] **Task 1: Setup New Directory Structure** aa1ff20
   - Create the `src/` directory.
   - Move Python modules: `bot_engine.py`, `browser_driver.py`, `cookie_manager.py`, `downloader.py`, `find_vimeo_url.py`, `job_manager.py`, `pdf_converter_py.py` to `src/`.
@@ -19,7 +19,7 @@ This plan outlines the steps to reorganize the Zaknotes codebase, clean up legac
 - [x] **Task 5: Verify Module Integrity** f768f5b
   - **Write Tests**: Create a basic sanity test to ensure all modules can be imported without errors in the new structure.
   - **Implement**: Adjust code until sanity tests pass.
-- [ ] **Task: Conductor - User Manual Verification 'Project Structure Reorganization' (Protocol in workflow.md)**
+- [x] **Task: Conductor - User Manual Verification 'Project Structure Reorganization' (Protocol in workflow.md)** b71252d
 
 ## Phase 2: Unified CLI Implementation (`zaknotes.py`)
 - [ ] **Task 1: Implement Menu Framework**

@@ -9,7 +9,7 @@ Focus: Identifying and fixing why the bot stalls during model/system instruction
 - [x] Task: Verify fix manually by running the bot through multiple model selection cycles. 3b4f13e
 - [x] Task: Conductor - User Manual Verification 'UI Stability & Root Cause Investigation' (Protocol in workflow.md) 0c8b22f
 
-## Phase 2: AI Response Reliability
+## Phase 2: AI Response Reliability [checkpoint: 4291d83]
 Focus: Preventing empty PDFs by ensuring the AI has finished generating content.
 
 - [x] Task: Implement 2-second mandatory sleep after file upload completion in `src/bot_engine.py`. 475b565
@@ -18,7 +18,7 @@ Focus: Preventing empty PDFs by ensuring the AI has finished generating content.
     - Sub-task: Loop to compare content length every 1 second.
     - Sub-task: Implement 15-second inactivity timeout to stop waiting.
 - [x] Task: Write unit tests for the growth monitoring logic (using mocks for response content). 9168cdf
-- [ ] Task: Conductor - User Manual Verification 'AI Response Reliability' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'AI Response Reliability' (Protocol in workflow.md) 4291d83
 
 ## Phase 3: Job Management & Retry Logic
 Focus: Updating the queue system to automatically retry failed jobs.

@@ -158,7 +158,17 @@ class BrowserDriver:
         return page
 
     def close(self):
-        if self.browser:
-            self.browser.close()
-        if self.playwright:
-            self.playwright.stop()
+        print("🔌 Disconnecting and stopping Playwright...")
+        try:
+            if self.context:
+                self.context.close()
+            if self.browser:
+                self.browser.close()
+            if self.playwright:
+                self.playwright.stop()
+        except Exception as e:
+            print(f"   (Internal) Error during Playwright stop: {e}")
+        finally:
+            self.context = None
+            self.browser = None
+            self.playwright = None

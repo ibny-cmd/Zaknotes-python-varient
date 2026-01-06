@@ -9,7 +9,7 @@ import glob
 
 # --- CONFIGURATION ---
 TARGET_MODEL_NAME = "Gemini 3 Pro Preview"
-TARGET_MODEL_ID = "model-carousel-row-models/gemini-3-pro-preview"
+TARGET_MODEL_ID = "model-carousel-row-models/gemini-3-pro-previe"
 TARGET_SYSTEM_INSTRUCTION = "note generator"
 
 TEMP_DIR = "temp" 
@@ -168,9 +168,12 @@ class AIStudioBot:
         """Hard reset: closes current driver/browser and reconnects."""
         print("🔄 Bot: Restarting browser session (hard reset)...")
         try:
-            self.driver.close()
-        except:
-            pass
+            if self.driver:
+                self.driver.close()
+        except Exception as e:
+            print(f"   (Internal) Error during driver close: {e}")
+        
+        time.sleep(2) # Give OS time to release resources
         self.driver = BrowserDriver()
         self.ensure_connection()
 
@@ -238,11 +241,11 @@ class AIStudioBot:
                     print("   🚀 Response text started.")
                     break
                 
-                if time.time() - start_wait_time > 120: # Wait up to 2 mins for thinking to finish
-                    print("   ⚠️ Timed out waiting for text start. Assuming empty or done.")
+                if time.time() - start_wait_time > 600: # Wait up to 10 mins for thinking to finish
+                    print("   ⚠️ Timed out waiting for text start after 10m. Assuming empty or done.")
                     break
                 
-                if int(time.time() - start_wait_time) % 5 == 0:
+                if int(time.time() - start_wait_time) % 10 == 0:
                     print(f"   ... Thinking / Waiting ({int(time.time() - start_wait_time)}s) ...")
                 time.sleep(1)
 
@@ -263,9 +266,9 @@ class AIStudioBot:
                 else:
                     stable_seconds += 1
                 
-                # Safety timeout (5 mins max generation)
-                if elapsed > 300:
-                    print("   ⚠️ Hit max generation limit (5m). Proceeding.")
+                # Safety timeout (20 mins max generation)
+                if elapsed > 1200:
+                    print("   ⚠️ Hit max generation limit (20m). Proceeding.")
                     break
 
                 time.sleep(1)

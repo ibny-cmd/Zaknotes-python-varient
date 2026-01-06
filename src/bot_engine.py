@@ -164,6 +164,16 @@ class AIStudioBot:
             return totalLength;
         }""")
 
+    def restart_session(self):
+        """Hard reset: closes current driver/browser and reconnects."""
+        print("🔄 Bot: Restarting browser session (hard reset)...")
+        try:
+            self.driver.close()
+        except:
+            pass
+        self.driver = BrowserDriver()
+        self.ensure_connection()
+
     def generate_notes(self, audio_path):
         if not os.path.exists(audio_path):
             print(f"❌ File not found: {audio_path}")
@@ -305,7 +315,7 @@ class AIStudioBot:
         self.driver.close()
 
 def process_job(bot, job_manager, job):
-    """Processes a single job: download -> transcribe -> PDF"""
+    """Processes a single job with retry/restart logic"""
     try:
         # Update status to downloading
         job['status'] = 'downloading'
@@ -318,20 +328,35 @@ def process_job(bot, job_manager, job):
         job['status'] = 'processing'
         job_manager.save_history()
         
-        # Phase 3: AI Studio Automation
-        bot.ensure_connection()
-        bot.select_model()
-        bot.select_system_instruction()
-        
-        text, pdf_path = bot.generate_notes(audio_path)
-        
-        if pdf_path:
-            job['status'] = 'completed'
-            job['pdf_path'] = pdf_path
-            print(f"\n✨ SUCCESSFULLY COMPLETED: {job['name']}")
-        else:
-            job['status'] = 'failed'
-            print(f"\n❌ FAILED DURING GENERATION: {job['name']}")
+        # Phase 3: AI Studio Automation with Hard Reset Recovery
+        max_attempts = 2
+        for attempt in range(max_attempts):
+            try:
+                bot.ensure_connection()
+                bot.select_model()
+                bot.select_system_instruction()
+                
+                text, pdf_path = bot.generate_notes(audio_path)
+                
+                if pdf_path:
+                    job['status'] = 'completed'
+                    job['pdf_path'] = pdf_path
+                    print(f"\n✨ SUCCESSFULLY COMPLETED: {job['name']}")
+                    return # SUCCESS
+                else:
+                    raise Exception("PDF path not generated")
+
+            except Exception as e:
+                print(f"   ⚠️ Interaction failure on attempt {attempt + 1}: {e}")
+                if attempt < max_attempts - 1:
+                    print("   🔄 Attempting hard reset and retry...")
+                    bot.restart_session()
+                    time.sleep(2)
+                else:
+                    # Final attempt failed
+                    job['status'] = 'failed'
+                    job['error'] = str(e)
+                    print(f"\n❌ FAILED AFTER {max_attempts} ATTEMPTS: {job['name']}")
             
     except Exception as e:
         job['status'] = 'failed'

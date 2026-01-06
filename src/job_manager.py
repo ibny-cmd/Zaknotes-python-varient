@@ -27,9 +27,9 @@ class JobManager:
 
     def get_pending_from_last_150(self):
         """
-        Return list of ALL jobs with status 'queue' in history.
+        Return list of jobs with status 'queue' OR 'failed' (for retry).
         """
-        pending = [job for job in self.history if job.get('status') == 'queue']
+        pending = [job for job in self.history if job.get('status') in ['queue', 'failed']]
         return pending
 
     def cancel_pending(self):

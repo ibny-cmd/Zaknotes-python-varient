@@ -63,21 +63,35 @@ class AIStudioBot:
                 return
 
             print(f"   Mismatch. Switching from '{current_text}'...")
-            card.click()
             
             target_btn_selector = f'button[id="{TARGET_MODEL_ID}"]'
-            try:
-                target_btn = self.page.wait_for_selector(target_btn_selector, timeout=5000)
-                target_btn.click()
-            except PlaywrightTimeoutError:
-                print("   Target model not immediately visible, trying to switch to 'All' tab...")
-                all_btn = self.page.locator("button[data-test-category-button='']").filter(has_text="All")
-                if all_btn.is_visible():
-                    all_btn.click()
-                target_btn = self.page.wait_for_selector(target_btn_selector, timeout=5000)
-                target_btn.click()
+            
+            for attempt in range(3):
+                print(f"   Selection attempt {attempt + 1}...")
+                card.click()
+                
+                try:
+                    target_btn = self.page.wait_for_selector(target_btn_selector, timeout=5000)
+                    target_btn.click()
+                    print(f"   ✅ Switched to {TARGET_MODEL_NAME}")
+                    return
+                except PlaywrightTimeoutError:
+                    print("   Target model not immediately visible, trying to switch to 'All' tab...")
+                    all_btn = self.page.locator("button[data-test-category-button='']").filter(has_text="All")
+                    if all_btn.is_visible():
+                        all_btn.click()
+                        try:
+                            target_btn = self.page.wait_for_selector(target_btn_selector, timeout=3000)
+                            target_btn.click()
+                            print(f"   ✅ Switched to {TARGET_MODEL_NAME} (via 'All' tab)")
+                            return
+                        except:
+                            pass
+                
+                print("   Retrying model sidebar interaction...")
+                time.sleep(1)
 
-            print(f"   ✅ Switched to {TARGET_MODEL_NAME}")
+            raise Exception(f"Failed to select model {TARGET_MODEL_NAME} after 3 attempts.")
             
         except Exception as e:
             print(f"   ❌ Model selection error: {e}")
@@ -89,31 +103,42 @@ class AIStudioBot:
         try:
             card_selector = "button.system-instructions-card"
             card = self.page.wait_for_selector(card_selector, timeout=10000)
-            card.click()
             
             dropdown_selector = ".mat-mdc-select-trigger"
-            dropdown = self.page.wait_for_selector(dropdown_selector, timeout=5000)
             
-            current_val = dropdown.text_content().strip()
-            if instruction_name in current_val:
-                 print(f"   ✅ Already using '{instruction_name}'.")
-            else:
-                print("   Setting instruction...")
-                dropdown.click()
+            for attempt in range(3):
+                print(f"   Instruction selection attempt {attempt + 1}...")
+                card.click()
                 
-                option = self.page.locator("mat-option").filter(has_text=instruction_name).first
-                option.wait_for(state="visible", timeout=5000)
-                option.click()
-                
-                print(f"   ✅ Selected: {instruction_name}")
+                try:
+                    dropdown = self.page.wait_for_selector(dropdown_selector, timeout=5000)
+                    current_val = dropdown.text_content().strip()
+                    
+                    if instruction_name in current_val:
+                         print(f"   ✅ Already using '{instruction_name}'.")
+                    else:
+                        print("   Setting instruction...")
+                        dropdown.click()
+                        
+                        option = self.page.locator("mat-option").filter(has_text=instruction_name).first
+                        option.wait_for(state="visible", timeout=5000)
+                        option.click()
+                        print(f"   ✅ Selected: {instruction_name}")
+                    
+                    # Explicitly close the sidebar after selection
+                    try:
+                        self.page.locator('button[aria-label="Close panel"]').click(timeout=2000)
+                        print("   Closed system prompt panel.")
+                    except:
+                        pass
+                    
+                    return # SUCCESS
+                    
+                except PlaywrightTimeoutError:
+                    print("   System instruction dropdown not visible. Retrying sidebar click...")
+                    time.sleep(1)
 
-            # Explicitly close the sidebar after selection
-            try:
-                self.page.locator('button[aria-label="Close panel"]').click(timeout=2000)
-                print("   Closed system prompt panel.")
-            except Exception as e:
-                # It might have closed automatically
-                pass
+            raise Exception(f"Failed to select system instruction {instruction_name} after 3 attempts.")
 
         except Exception as e:
             print(f"   ❌ System Instruction selection error: {e}")

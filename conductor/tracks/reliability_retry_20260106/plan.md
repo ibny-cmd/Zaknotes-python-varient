@@ -23,7 +23,7 @@ Focus: Preventing empty PDFs by ensuring the AI has finished generating content.
 ## Phase 3: Job Management & Retry Logic
 Focus: Updating the queue system to automatically retry failed jobs.
 
-- [ ] Task: Update `src/job_manager.py` to include `failed` status in the list of jobs to be processed.
+- [x] Task: Update `src/job_manager.py` to include `failed` status in the list of jobs to be processed. c16a61e
 - [ ] Task: Modify job selection logic in the CLI menu to group `pending` and `failed` jobs together for the user.
 - [ ] Task: Ensure `cancelled` jobs are explicitly ignored in all processing queries.
 - [ ] Task: Write unit tests in `tests/test_job_manager_logic.py` for the updated queue selection logic.

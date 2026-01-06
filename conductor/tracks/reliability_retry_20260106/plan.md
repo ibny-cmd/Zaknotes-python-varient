@@ -20,14 +20,14 @@ Focus: Preventing empty PDFs by ensuring the AI has finished generating content.
 - [x] Task: Write unit tests for the growth monitoring logic (using mocks for response content). 9168cdf
 - [x] Task: Conductor - User Manual Verification 'AI Response Reliability' (Protocol in workflow.md) 4291d83
 
-## Phase 3: Job Management & Retry Logic
+## Phase 3: Job Management & Retry Logic [checkpoint: c141c6f]
 Focus: Updating the queue system to automatically retry failed jobs.
 
 - [x] Task: Update `src/job_manager.py` to include `failed`, `downloading`, and `processing` statuses in the list of jobs to be processed. 3cffc47
 - [x] Task: Modify job selection logic in the CLI menu to group old jobs together and rename option 4 to 'Process Old Jobs'. 3cffc47
 - [x] Task: Ensure `cancelled` jobs are explicitly ignored in all processing queries. 3cffc47
 - [x] Task: Write unit tests in `tests/test_job_manager_logic.py` for the updated queue selection logic. 3cffc47
-- [ ] Task: Conductor - User Manual Verification 'Job Management & Retry Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Job Management & Retry Logic' (Protocol in workflow.md) c141c6f
 
 ## Phase 4: Fallback Recovery System
 Focus: Implementing a "hard reset" mechanism if UI interactions fail despite the fix.

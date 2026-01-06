@@ -26,7 +26,7 @@ Focus: Updating the queue system to automatically retry failed jobs.
 - [x] Task: Update `src/job_manager.py` to include `failed` status in the list of jobs to be processed. c16a61e
 - [x] Task: Modify job selection logic in the CLI menu to group `pending` and `failed` jobs together for the user. 9ce18c2
 - [x] Task: Ensure `cancelled` jobs are explicitly ignored in all processing queries. 9ce18c2
-- [ ] Task: Write unit tests in `tests/test_job_manager_logic.py` for the updated queue selection logic.
+- [x] Task: Write unit tests in `tests/test_job_manager_logic.py` for the updated queue selection logic. 1a533f8
 - [ ] Task: Conductor - User Manual Verification 'Job Management & Retry Logic' (Protocol in workflow.md)
 
 ## Phase 4: Fallback Recovery System

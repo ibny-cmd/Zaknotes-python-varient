@@ -169,7 +169,8 @@ class AIStudioBot:
 
             # Press escape to close the media menu and prevent interception
             self.page.keyboard.press("Escape")
-            print("   Pressed 'Escape' to close media popup.")
+            print("   Pressed 'Escape' to close media popup. Waiting 2s for upload stability...")
+            time.sleep(2)
 
             # 3. WAIT FOR RUN
             print("   Waiting for 'Run'...")

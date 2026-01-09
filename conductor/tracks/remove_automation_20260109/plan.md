@@ -7,11 +7,11 @@
 - [x] Task: Conductor - User Manual Verification 'Logic Replacement & Placeholder Implementation' (Protocol in workflow.md) 1bf68a4
 
 ## Phase 2: Selenium to Playwright Migration
-- [ ] Task: Create `tests/test_find_vimeo_url.py` to test the current Vimeo URL extraction logic (Red Phase).
-- [ ] Task: Refactor `src/find_vimeo_url.py` to use `playwright` instead of `selenium`.
-- [ ] Task: Verify that `src/find_vimeo_url.py` correctly extracts Vimeo URLs using Playwright.
-- [ ] Task: Remove `selenium` from `requirements.txt`.
-- [ ] Task: Conductor - User Manual Verification 'Selenium to Playwright Migration' (Protocol in workflow.md)
+- [x] Task: Create `tests/test_find_vimeo_url.py` to test the current Vimeo URL extraction logic (Red Phase). c44aa8d
+- [x] Task: Refactor `src/find_vimeo_url.py` to use `playwright` instead of `selenium`. c44aa8d
+- [x] Task: Verify that `src/find_vimeo_url.py` correctly extracts Vimeo URLs using Playwright. c44aa8d
+- [x] Task: Remove `selenium` from `requirements.txt`. c44aa8d
+- [x] Task: Conductor - User Manual Verification 'Selenium to Playwright Migration' (Protocol in workflow.md) 5eb052f
 
 ## Phase 3: Component Removal
 - [ ] Task: Delete `src/browser_driver.py`.

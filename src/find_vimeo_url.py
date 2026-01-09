@@ -44,15 +44,21 @@ def parse_netscape_cookies(cookie_file_path, target_domain):
                 
                 # Check if cookie belongs to target domain
                 if target_domain.endswith(domain.lstrip('.')) or domain.lstrip('.').endswith(target_domain):
+                    expires = int(expiration) if expiration.isdigit() else -1
+                    # Treat 0 as session cookie (-1)
+                    if expires == 0:
+                        expires = -1
+                        
                     cookie = {
                         'name': name,
                         'value': value,
                         'domain': domain if domain.startswith('.') else '.' + domain,
                         'path': path,
                         'secure': secure,
-                        'expires': int(expiration) if expiration.isdigit() else -1
+                        'expires': expires
                     }
                     cookies.append(cookie)
+                    print(f"DEBUG: Parsed cookie: {name} (expires={expires}, domain={cookie['domain']})", file=sys.stderr)
     
     except FileNotFoundError:
         print(f"ERROR: Cookie file not found: {cookie_file_path}", file=sys.stderr)
@@ -86,7 +92,18 @@ def extract_vimeo_url(url, cookie_file):
             )
             
             # Add cookies to context
-            context.add_cookies(cookies)
+            try:
+                context.add_cookies(cookies)
+            except Exception as e:
+                print(f"ERROR: Failed to add cookies: {e}", file=sys.stderr)
+                # Try adding one by one to find the culprit
+                for cookie in cookies:
+                    try:
+                        context.add_cookies([cookie])
+                    except Exception as inner_e:
+                        print(f"ERROR: Bad cookie: {cookie['name']} - {inner_e}", file=sys.stderr)
+                browser.close()
+                sys.exit(1)
             
             page = context.new_page()
             

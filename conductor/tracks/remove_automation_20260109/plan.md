@@ -21,6 +21,6 @@
 - [x] Task: Conductor - User Manual Verification 'Component Removal' (Protocol in workflow.md) bbfba2f
 
 ## Phase 4: Cleanup & Verification
-- [ ] Task: Audit `requirements.txt` and remove any dependencies that are now strictly unused (like `webdriver-manager` if present).
-- [ ] Task: Final verification that the application starts and video download references are intact.
-- [ ] Task: Conductor - User Manual Verification 'Cleanup & Verification' (Protocol in workflow.md)
+- [x] Task: Audit `requirements.txt` and remove any dependencies that are now strictly unused (like `webdriver-manager` if present). 2317fd4
+- [x] Task: Final verification that the application starts and video download references are intact. 2317fd4
+- [x] Task: Conductor - User Manual Verification 'Cleanup & Verification' (Protocol in workflow.md) 2317fd4

@@ -4,43 +4,12 @@ import sys
 import shutil
 from src.job_manager import JobManager
 from src.cookie_manager import interactive_update as refresh_cookies
-from src.browser_driver import BrowserDriver
 
 def refresh_browser_profile():
-    print("🧹 Cleaning up browser profile...")
-    profile_dir = "browser_profile"
-    if os.path.exists(profile_dir):
-        shutil.rmtree(profile_dir)
-        print(f"✅ Deleted {profile_dir}")
-    else:
-        print("ℹ️ No existing profile found.")
-    
-    print("🚀 Launching browser for manual login...")
-    print("Please login to Google AI Studio and other necessary sites.")
-    print("Close the browser window when finished.")
-    
-    driver = BrowserDriver()
-    driver.launch_browser()
-    # Since it's Popen in background, we might want to wait or just inform user
-    print("\n✅ Browser launched. Follow the steps in the browser window.")
+    print("Browser automation placeholder triggered")
 
 def run_processing_pipeline(manager):
-    # Import here to avoid circular dependencies and only when needed
-    from src.bot_engine import AIStudioBot, process_job
-    
-    pending_jobs = manager.get_pending_from_last_150()
-    
-    if not pending_jobs:
-        print("📭 No old jobs (pending/failed/stuck) in queue.")
-        return
-
-    print(f"📂 Found {len(pending_jobs)} old jobs to process.")
-    bot = AIStudioBot()
-    try:
-        for job in pending_jobs:
-            process_job(bot, manager, job)
-    finally:
-        bot.close()
+    print("Browser automation placeholder triggered")
 
 def start_note_generation():
     manager = JobManager()
@@ -89,18 +58,7 @@ def start_note_generation():
             print("❌ Invalid choice.")
 
 def launch_manual_browser():
-    print("\n🚀 Launching Browser for manual inspection...")
-    print("📂 Using profile: browser_profile")
-    print("------------------------------------------")
-    driver = BrowserDriver()
-    try:
-        if driver.launch_browser():
-            print("\n✅ Browser is running.")
-            input("\nPress Enter to close browser and return to menu...")
-    except Exception as e:
-        print(f"❌ Failed to launch browser: {e}")
-    finally:
-        driver.close()
+    print("Browser automation placeholder triggered")
 
 def main_menu():
     while True:

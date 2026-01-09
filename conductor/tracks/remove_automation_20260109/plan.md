@@ -13,7 +13,7 @@
 - [x] Task: Remove `selenium` from `requirements.txt`. c44aa8d
 - [x] Task: Conductor - User Manual Verification 'Selenium to Playwright Migration' (Protocol in workflow.md) 5eb052f
 
-## Phase 3: Component Removal
+## Phase 3: Component Removal [checkpoint: 59a4cec]
 - [x] Task: Delete `src/browser_driver.py`. bbfba2f
 - [x] Task: Delete `src/bot_engine.py`. bbfba2f
 - [x] Task: Delete `src/ui_elements/` directory. bbfba2f

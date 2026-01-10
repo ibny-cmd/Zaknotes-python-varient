@@ -29,7 +29,7 @@ This plan outlines the steps to transition the Zaknotes pipeline from browser-ba
 
 ## Phase 4: Pipeline Orchestration & Fail-Fast Logic
 - [x] Task: TDD - Implement `ProcessingPipeline.execute_job` to link downloader, audio processing, transcription, note generation, and existing PDF conversion. f7bb8d9
-- [~] Task: Implement Batch Management logic: If one job in a session fails, update the status of all other "in-progress" or "queued" jobs in that batch to `failed`.
-- [ ] Task: Implement `FileCleanupService` for automatic deletion of intermediate files (chunks, `.txt`, `.md`) after each successful stage and final completion.
+- [x] Task: Implement Batch Management logic: If one job in a session fails, update the status of all other "in-progress" or "queued" jobs in that batch to `failed`. f24166f
+- [~] Task: Implement `FileCleanupService` for automatic deletion of intermediate files (chunks, `.txt`, `.md`) after each successful stage and final completion.
 - [ ] Task: Integrate the new pipeline into `zaknotes.py`'s `run_processing_pipeline`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Pipeline Orchestration & Fail-Fast Logic' (Protocol in workflow.md)

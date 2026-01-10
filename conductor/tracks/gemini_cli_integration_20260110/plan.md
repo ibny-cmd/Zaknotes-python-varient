@@ -8,7 +8,8 @@ This plan outlines the steps to transition the Zaknotes pipeline from browser-ba
     - Remove "Refresh Browser Profile".
     - Add "Configure Gemini Models" to allow setting models for transcription and note generation.
     - Add "Cleanup Stranded Audio Chunks" utility.
-- [~] Task: Implement `ConfigManager` to persist model preferences and other settings in a `config.json` file.
+- [x] Task: Implement `ConfigManager` to persist model preferences and other settings in a `config.json` file. 04b22fc
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment Setup & Configuration' (Protocol in workflow.md)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment Setup & Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Audio Processing Module (ffmpeg Integration)

@@ -2,6 +2,7 @@ import json
 import os
 from typing import List
 from src.gemini_wrapper import GeminiCLIWrapper
+from src.prompts import TRANSCRIPTION_PROMPT
 
 class TranscriptionService:
     @staticmethod
@@ -20,7 +21,8 @@ class TranscriptionService:
             os.remove(output_file)
 
         for chunk in chunks:
-            prompt = f"Transcribe this audio @{chunk} exactly as spoken. Output *only* the transcript text, no explanation, no translation."
+            # Use format to inject chunk path
+            prompt = TRANSCRIPTION_PROMPT.format(chunk=chunk)
             args = [
                 "-m", model,
                 "--output-format", "json",

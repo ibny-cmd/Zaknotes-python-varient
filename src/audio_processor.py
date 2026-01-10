@@ -31,3 +31,37 @@ class AudioProcessor:
         except subprocess.CalledProcessError as e:
             print(f"Error during re-encoding: {e.stderr.decode()}")
             return False
+
+    @staticmethod
+    def split_into_chunks(input_path: str, output_pattern: str, segment_time: int = 1800) -> List[str]:
+        """
+        Splits the audio into chunks of specified duration (default 1800s / 30m).
+        Returns a list of paths to the created chunks.
+        """
+        try:
+            command = [
+                "ffmpeg", "-y", "-i", input_path,
+                "-f", "segment",
+                "-segment_time", str(segment_time),
+                "-c", "copy",
+                output_pattern
+            ]
+            subprocess.run(command, check=True, capture_output=True)
+            
+            # Find the created files
+            directory = os.path.dirname(output_pattern) or "."
+            # Base name without the format specifier
+            # Handle cases like chunk_%03d.mp3
+            base_parts = os.path.basename(output_pattern).split("%")
+            prefix = base_parts[0]
+            
+            chunks = []
+            for f in sorted(os.listdir(directory)):
+                if f.startswith(prefix) and f != os.path.basename(input_path):
+                     # Check if it matches the pattern (roughly)
+                     chunks.append(os.path.join(directory, f))
+            return chunks
+            
+        except subprocess.CalledProcessError as e:
+            print(f"Error during splitting: {e.stderr.decode()}")
+            return []

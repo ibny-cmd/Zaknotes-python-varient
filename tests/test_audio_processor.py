@@ -53,3 +53,14 @@ def test_reencode_audio(real_audio_file, tmp_path):
     assert success is True
     assert os.path.exists(output_file)
     assert os.path.getsize(output_file) < os.path.getsize(real_audio_file)
+
+def test_split_into_chunks(real_audio_file, tmp_path):
+    """Test splitting audio into chunks."""
+    output_pattern = str(tmp_path / "chunk_%03d.mp3")
+    
+    # Split 5s file into 2s chunks -> should produce 3 chunks (2s, 2s, 1s)
+    chunks = AudioProcessor.split_into_chunks(real_audio_file, output_pattern, segment_time=2)
+    
+    assert len(chunks) >= 2
+    for chunk in chunks:
+        assert os.path.exists(chunk)

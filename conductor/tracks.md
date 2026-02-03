@@ -4,10 +4,15 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [~] Track: Remove Browser Automation and UI Elements
-*Link: [./conductor/tracks/remove_automation_20260109/](./conductor/tracks/remove_automation_20260109/)*
+## [x] Track: Remove Browser Automation and UI Elements
+*Link: [./conductor/archive/remove_automation_20260109/](./conductor/archive/remove_automation_20260109/)*
 
 ---
 
-## [~] Track: Replace AI Studio automation with Gemini CLI for audio transcription and note generation
-*Link: [./conductor/tracks/gemini_cli_integration_20260110/](./conductor/tracks/gemini_cli_integration_20260110/)*
+## [x] Track: Replace AI Studio automation with Gemini CLI for audio transcription and note generation
+*Link: [./conductor/archive/gemini_cli_integration_20260110/](./conductor/archive/gemini_cli_integration_20260110/)*
+
+---
+
+## [~] Track: Gemini API Integration & Refactor
+*Link: [./conductor/tracks/gemini_api_integration_20260203/](./conductor/tracks/gemini_api_integration_20260203/)*

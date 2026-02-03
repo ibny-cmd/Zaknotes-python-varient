@@ -11,3 +11,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Replace AI Studio automation with Gemini CLI for audio transcription and note generation
 *Link: [./conductor/archive/gemini_cli_integration_20260110/](./conductor/archive/gemini_cli_integration_20260110/)*
+
+---
+
+## [x] Track: Comprehensive project documentation overhaul with Arch Linux focus
+*Link: [./conductor/tracks/project_docs_arch_20260203/](./conductor/tracks/project_docs_arch_20260203/)*

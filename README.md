@@ -83,3 +83,22 @@ If a process is interrupted, temporary audio files might remain. Use this option
 
 ### 5. Refresh Cookies
 For platforms requiring authentication (like some Facebook or private classroom videos), use this to update your `cookies/bangi.txt` file via an interactive paste.
+
+---
+
+## ❓ Troubleshooting
+
+### "429 Too Many Requests"
+This means your Gemini API key has hit its limit for the day (20 requests per model).
+- **Solution:** Add more API keys via **Option 2** in the main menu. Zaknotes will automatically cycle through all available keys.
+
+### YouTube "n challenge" or Extraction Errors
+If `yt-dlp` fails to download from YouTube, it usually means it cannot find a JavaScript runtime.
+- **Solution:** Ensure `nodejs` is installed and the `node` command is available in your PATH. Run `node --version` to verify.
+
+### 403 Forbidden (Facebook/Private Links)
+- **Solution:** Your cookies may have expired. Use **Option 5: Refresh Cookies** to update your authentication state.
+
+### Stranded Files
+If the tool crashes, you might see large files in the `temp/` directory.
+- **Solution:** Use **Option 4: Cleanup Stranded Audio Chunks** to free up space.

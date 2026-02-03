@@ -37,7 +37,8 @@ class APIKeyManager:
         
         self.data["keys"].append({
             "key": key,
-            "usage": {model: 0 for model in self.MODELS}
+            "usage": {model: 0 for model in self.MODELS},
+            "exhausted": {model: False for model in self.MODELS}
         })
         self._save_data()
         return True
@@ -63,14 +64,41 @@ class APIKeyManager:
                 return True
         return False
 
+    def mark_exhausted(self, key, model):
+        """Mark a key as exhausted for a specific model (usually after 429)."""
+        for k in self.data["keys"]:
+            if k["key"] == key:
+                if "exhausted" not in k:
+                    k["exhausted"] = {m: False for m in self.MODELS}
+                k["exhausted"][model] = True
+                self._save_data()
+                return True
+        return False
+
     def get_available_key(self, model):
         self.reset_quotas_if_needed()
         
         for k in self.data["keys"]:
             usage = k["usage"].get(model, 0)
-            if usage < self.QUOTA_LIMIT:
+            exhausted = k.get("exhausted", {}).get(model, False)
+            
+            if not exhausted and usage < self.QUOTA_LIMIT:
                 return k["key"]
         return None
+
+    def get_status_report(self):
+        """Returns a list of status strings for all keys."""
+        report = []
+        for k in self.data["keys"]:
+            masked = k['key'][:4] + "..." + k['key'][-4:] if len(k['key']) > 8 else "****"
+            status_line = f"Key: {masked}"
+            for model in self.MODELS:
+                usage = k["usage"].get(model, 0)
+                exh = k.get("exhausted", {}).get(model, False)
+                marker = " [EXHAUSTED]" if exh or usage >= self.QUOTA_LIMIT else ""
+                status_line += f"\n  - {model}: {usage}/{self.QUOTA_LIMIT}{marker}"
+            report.append(status_line)
+        return report
 
     def _get_current_time_pt(self):
         """Get current time in Pacific Time."""
@@ -100,6 +128,7 @@ class APIKeyManager:
         if self.data["last_reset_date"] != today_str:
             for k in self.data["keys"]:
                 k["usage"] = {model: 0 for model in self.MODELS}
+                k["exhausted"] = {model: False for model in self.MODELS}
             self.data["last_reset_date"] = today_str
             self._save_data()
             return True

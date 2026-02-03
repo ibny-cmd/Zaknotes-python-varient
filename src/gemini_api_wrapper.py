@@ -35,12 +35,7 @@ class GeminiAPIWrapper:
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
                     # Quota exhausted for this key, try next one
-                    # We mark it as used to trigger rotation in next _get_client call
-                    # Actually record_usage increments, but get_available_key checks limit.
-                    # To be safe, let's force a high usage for this key/model if it's 429
-                    # or just rely on the fact that record_usage might not have been called.
-                    # Let's just record usage to be sure we eventually rotate.
-                    self.key_manager.record_usage(api_key, model_name)
+                    self.key_manager.mark_exhausted(api_key, model_name)
                     continue
                 raise
             except Exception:
@@ -64,7 +59,7 @@ class GeminiAPIWrapper:
                 return response.text
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
-                    self.key_manager.record_usage(api_key, model_name)
+                    self.key_manager.mark_exhausted(api_key, model_name)
                     continue
                 raise
             except Exception:

@@ -25,9 +25,10 @@ def manage_api_keys():
         
         print("\n1. Add API Key")
         print("2. Remove API Key")
-        print("3. Back to Main Menu")
+        print("3. View Quota Status")
+        print("4. Back to Main Menu")
         
-        choice = input("Enter your choice (1-3): ").strip()
+        choice = input("Enter your choice (1-4): ").strip()
         
         if choice == '1':
             key = input("Enter new Gemini API Key: ").strip()
@@ -51,6 +52,14 @@ def manage_api_keys():
             except ValueError:
                 print("❌ Please enter a number.")
         elif choice == '3':
+            report = manager.get_status_report()
+            if not report:
+                print("No API keys configured.")
+            else:
+                print("\n--- API Key Quota Status ---")
+                for line in report:
+                    print(line)
+        elif choice == '4':
             break
         else:
             print("❌ Invalid choice.")

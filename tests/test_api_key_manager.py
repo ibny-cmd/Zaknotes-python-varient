@@ -85,23 +85,48 @@ def test_no_keys_available(key_manager):
     key = key_manager.get_available_key(model)
     assert key is None
 
+def test_mark_exhausted(key_manager):
+    """Test marking a key as exhausted."""
+    key_manager.add_key("key-1")
+    model = "gemini-2.5-flash"
+    key_manager.mark_exhausted("key-1", model)
+    
+    # get_available_key should skip it even if usage is 0
+    key = key_manager.get_available_key(model)
+    assert key is None
+
+def test_get_status_report(key_manager):
+    """Test the status report formatting."""
+    key_manager.add_key("key-123456789")
+    model = "gemini-2.5-flash"
+    key_manager.record_usage("key-123456789", model)
+    key_manager.mark_exhausted("key-123456789", "gemini-3-flash-preview")
+    
+    report = key_manager.get_status_report()
+    assert len(report) == 1
+    assert "key-...6789" in report[0]
+    assert "gemini-2.5-flash: 1/20" in report[0]
+    assert "gemini-3-flash-preview: 0/20 [EXHAUSTED]" in report[0]
+
 def test_quota_reset_at_midnight_pt(key_manager):
-    """Test that quotas reset at PT midnight."""
+    """Test that quotas and exhausted flags reset at PT midnight."""
     key_manager.add_key("key-1")
     model = "gemini-2.5-flash"
     
-    # Use some quota on day 1
+    # Use some quota and mark exhausted on day 1
     key_manager.record_usage("key-1", model)
+    key_manager.mark_exhausted("key-1", model)
     
     # Mock current time to be next day PT
-    # Midnight PT is UTC-8 (or UTC-7 during DST, but let's assume standard for now or just next calendar day)
     with patch('src.api_key_manager.APIKeyManager._get_current_time_pt') as mock_time:
         # Day 1
         mock_time.return_value = datetime(2026, 2, 3, 12, 0, tzinfo=timezone(timedelta(hours=-8)))
         key_manager.reset_quotas_if_needed()
         assert key_manager.list_keys()[0]["usage"][model] == 1
+        assert key_manager.list_keys()[0]["exhausted"][model] is True
         
         # Day 2
         mock_time.return_value = datetime(2026, 2, 4, 0, 1, tzinfo=timezone(timedelta(hours=-8)))
         key_manager.reset_quotas_if_needed()
         assert key_manager.list_keys()[0]["usage"][model] == 0
+        assert key_manager.list_keys()[0]["exhausted"][model] is False

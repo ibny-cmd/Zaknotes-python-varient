@@ -55,3 +55,31 @@ Once the pipeline finishes, your high-quality Markdown notes will be waiting for
 ```bash
 ls notes/
 ```
+
+---
+
+## 📖 Feature Deep-Dive
+
+Zaknotes offers a granular CLI interface to manage your learning materials.
+
+### 1. Note Generation Sub-Menu
+- **Start New Jobs (Cancel Old Jobs):** Clears the current queue and starts a fresh batch.
+- **Start New Jobs (Add to Queue):** Appends new links to your existing processing queue.
+- **Cancel All Old Jobs:** Flushes the queue without starting new work.
+- **Process Old Jobs:** Resumes processing any pending links in the queue.
+
+### 2. Manage API Keys
+Zaknotes supports multiple API keys to help you stay within free tier limits.
+- **Add/Remove Keys:** Easily cycle through your available Gemini keys.
+- **View Quota Status:** Get a real-time report of usage per key. If a key returns a `429 Too Many Requests` error, Zaknotes automatically marks it as **[EXHAUSTED]** for the day and cycles to the next one.
+
+### 3. Configure Audio Chunking
+Long lectures are automatically split into manageable parts for the AI.
+- **Default:** 1800s (30 minutes).
+- **Customization:** You can increase or decrease this based on the complexity of the content or API stability.
+
+### 4. Cleanup Stranded Audio Chunks
+If a process is interrupted, temporary audio files might remain. Use this option to safely purge the `temp/` directory and reclaim disk space.
+
+### 5. Refresh Cookies
+For platforms requiring authentication (like some Facebook or private classroom videos), use this to update your `cookies/bangi.txt` file via an interactive paste.

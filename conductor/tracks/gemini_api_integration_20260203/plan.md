@@ -4,8 +4,8 @@ This plan outlines the migration from the Gemini CLI to the official Google Gene
 
 ## Phase 1: Environment & Dependency Setup
 - [x] Task: Add `google-generativeai` using `uv add google-generativeai`. a0d72aa
-- [~] Task: Create `keys/` directory and ensure it is ignored by git.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Create `keys/` directory and ensure it is ignored by git. 9a28f6d
+- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: API Key & Quota Management
 - [ ] Task: Implement `src/api_key_manager.py` for managing keys and tracking usage.

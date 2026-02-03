@@ -24,11 +24,11 @@ This plan outlines the migration from the Gemini CLI to the official Google Gene
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) f9eaa58
 
 ## Phase 4: Audio Processing & Output Refactor
-- [~] Task: Update `src/audio_processor.py`.
-    - [ ] Sub-task: Support configurable `segment_time` (default 1800s).
-    - [ ] Sub-task: Retain silence removal but increase the silence threshold for safety (e.g., `-50dB`).
-    - [ ] Sub-task: Hardlock the bitrate to an optimal transcription value (e.g., `48k` or `64k`) and remove scaling logic.
-- [ ] Task: Add "Configure Audio Chunking Time" (default 30m) to the main menu in `zaknotes.py`.
+- [x] Task: Update `src/audio_processor.py`. b5524a5
+    - [x] Sub-task: Support configurable `segment_time` (default 1800s).
+    - [x] Sub-task: Retain silence removal but increase the silence threshold for safety (e.g., `-50dB`).
+    - [x] Sub-task: Hardlock the bitrate to an optimal transcription value (e.g., `48k` or `64k`) and remove scaling logic.
+- [~] Task: Add "Configure Audio Chunking Time" (default 30m) to the main menu in `zaknotes.py`.
 - [ ] Task: Refactor `src/pipeline.py`.
     - [ ] Sub-task: Add a 10-second wait (`time.sleep(10)`) before processing each audio chunk.
     - [ ] Sub-task: Remove PDF conversion steps and `PdfConverter` dependency.

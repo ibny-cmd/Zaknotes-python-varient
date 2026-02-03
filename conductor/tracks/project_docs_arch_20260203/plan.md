@@ -8,8 +8,8 @@ This plan outlines the overhaul of `README.md` to provide a helpful, step-by-ste
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) 17800dd
 
 ## Phase 2: Core Content Drafting
-- [~] Task: Write the Introduction and detailed Arch Linux Installation & Prerequisites sections.
-- [ ] Task: Create the "Happy Path" Quick Start Guide.
+- [x] Task: Write the Introduction and detailed Arch Linux Installation & Prerequisites sections. b6be1b6
+- [~] Task: Create the "Happy Path" Quick Start Guide.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Feature Deep-Dive & Troubleshooting

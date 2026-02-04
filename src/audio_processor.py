@@ -19,6 +19,20 @@ class AudioProcessor:
         return size_bytes < limit_bytes
 
     @staticmethod
+    def get_duration(file_path: str) -> float:
+        """Returns the duration of the audio file in seconds."""
+        try:
+            command = [
+                "ffprobe", "-v", "error", "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1", file_path
+            ]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            val = result.stdout.strip()
+            return float(val) if val and val != "N/A" else 0.0
+        except (subprocess.CalledProcessError, ValueError):
+            return 0.0
+
+    @staticmethod
     def get_bitrate(file_path: str) -> int:
         """Returns the bitrate in bits per second."""
         try:
@@ -43,12 +57,12 @@ class AudioProcessor:
             return 0
 
     @staticmethod
-    def reencode_to_optimal(input_path: str, output_path: str, bitrate: str = "48k") -> bool:
+    def reencode_to_optimal(input_path: str, output_path: str, bitrate: str = "48k", threads: int = 0) -> bool:
         """Re-encodes the audio to an optimal bitrate for transcription."""
         try:
-            print(f"      - Re-encoding {input_path} at {bitrate} (optimal)...")
+            print(f"      - Re-encoding {input_path} at {bitrate} (optimal, threads={threads})...")
             command = [
-                "ffmpeg", "-y", "-i", input_path,
+                "ffmpeg", "-y", "-threads", str(threads), "-i", input_path,
                 "-b:a", bitrate,
                 "-ac", "1", # Mono is usually better for transcription and smaller size
                 "-ar", "16000", # 16kHz is standard for many speech models
@@ -61,14 +75,12 @@ class AudioProcessor:
             return False
 
     @staticmethod
-    def remove_silence(input_path: str, output_path: str, threshold_db: int = -50) -> bool:
+    def remove_silence(input_path: str, output_path: str, threshold_db: int = -50, threads: int = 0) -> bool:
         """Removes silence from the audio using ffmpeg silenceremove filter."""
         try:
-            print(f"      - Removing silence (threshold: {threshold_db}dB)...")
-            # silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-50dB
-            # This removes all silence periods longer than 1s that are below -50dB
+            print(f"      - Removing silence (threshold: {threshold_db}dB, threads={threads})...")
             command = [
-                "ffmpeg", "-y", "-i", input_path,
+                "ffmpeg", "-y", "-threads", str(threads), "-i", input_path,
                 "-af", f"silenceremove=stop_periods=-1:stop_duration=1:stop_threshold={threshold_db}dB",
                 output_path
             ]
@@ -79,15 +91,15 @@ class AudioProcessor:
             return False
 
     @staticmethod
-    def split_into_chunks(input_path: str, output_pattern: str, segment_time: int = 1800) -> List[str]:
+    def split_into_chunks(input_path: str, output_pattern: str, segment_time: int = 1800, threads: int = 0) -> List[str]:
         """
         Splits the audio into chunks of specified duration (default 1800s / 30m).
         Returns a list of paths to the created chunks.
         """
         try:
-            print(f"      - Splitting into chunks of {segment_time}s...")
+            print(f"      - Splitting into chunks of {segment_time}s (threads={threads})...")
             command = [
-                "ffmpeg", "-y", "-i", input_path,
+                "ffmpeg", "-y", "-threads", str(threads), "-i", input_path,
                 "-f", "segment",
                 "-segment_time", str(segment_time),
                 "-c", "copy",
@@ -110,9 +122,9 @@ class AudioProcessor:
             return []
 
     @staticmethod
-    def process_for_transcription(input_path: str, limit_mb: int = 20, segment_time: int = 1800, output_dir: str = "temp") -> List[str]:
+    def process_for_transcription(input_path: str, segment_time: int = 1800, output_dir: str = "temp", threads: int = 0) -> List[str]:
         """
-        Orchestrates the audio processing.
+        Orchestrates the audio processing using duration-based chunking.
         """
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
@@ -126,28 +138,28 @@ class AudioProcessor:
         
         # Intermediate path for silence removal
         silence_removed_path = prepared_path + ".nosilence" + extension
-        if AudioProcessor.remove_silence(input_path, silence_removed_path):
-            if not AudioProcessor.reencode_to_optimal(silence_removed_path, prepared_path):
+        if AudioProcessor.remove_silence(input_path, silence_removed_path, threads=threads):
+            if not AudioProcessor.reencode_to_optimal(silence_removed_path, prepared_path, threads=threads):
                 # If re-encoding fails, use silence removed version
                 shutil.copy2(silence_removed_path, prepared_path)
             try: os.remove(silence_removed_path)
             except: pass
         else:
             # If silence removal fails, try re-encoding original
-            if not AudioProcessor.reencode_to_optimal(input_path, prepared_path):
+            if not AudioProcessor.reencode_to_optimal(input_path, prepared_path, threads=threads):
                 # If both fail, use original
                 shutil.copy2(input_path, prepared_path)
 
-        # 2. Check size and split if needed
-        size_mb = AudioProcessor.get_file_size(prepared_path) / (1024 * 1024)
-        if size_mb < limit_mb:
-            print(f"   - Processed file size ({size_mb:.2f}MB) is within limit.")
+        # 2. Check duration and split if needed
+        duration = AudioProcessor.get_duration(prepared_path)
+        if duration <= segment_time:
+            print(f"   - Processed file duration ({duration:.2f}s) is within limit ({segment_time}s).")
             return [prepared_path]
 
-        print(f"   - Processed file size ({size_mb:.2f}MB) still exceeds limit. Splitting...")
+        print(f"   - Processed file duration ({duration:.2f}s) exceeds limit ({segment_time}s). Splitting...")
         output_pattern = os.path.join(output_dir, f"{base_name}_chunk_%03d{extension}")
         
-        chunks = AudioProcessor.split_into_chunks(prepared_path, output_pattern, segment_time)
+        chunks = AudioProcessor.split_into_chunks(prepared_path, output_pattern, segment_time, threads=threads)
         print(f"   - Split into {len(chunks)} chunks.")
         
         return chunks

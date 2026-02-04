@@ -78,17 +78,150 @@ def test_split_into_chunks(real_audio_file, tmp_path):
     for chunk in chunks:
         assert os.path.exists(chunk)
 
-def test_process_for_transcription(real_audio_file, tmp_path):
-    """Test orchestration for transcription preparation."""
-    # Should always produce at least one "prepared" file
+def test_get_duration(real_audio_file):
+
+    """Test retrieving duration of an audio file."""
+
+    duration = AudioProcessor.get_duration(real_audio_file)
+
+    # real_audio_file was created with -t 5
+
+    assert 4.5 < duration < 5.5
+
+
+
+def test_thread_support(real_audio_file, tmp_path):
+
+    """Test that threads parameter is handled in ffmpeg commands."""
+
+    output_file = str(tmp_path / "threaded.mp3")
+
+    # Just verify it doesn't crash when threads=4 is passed
+
+    success = AudioProcessor.reencode_to_optimal(real_audio_file, output_file, bitrate="32k", threads=4)
+
+    assert success is True
+
+
+
+def test_duration_based_chunking(real_audio_file, tmp_path):
+
+
+
+    """Test that chunking is decided based on duration, not size."""
+
+
+
+    # 5s file, segment_time=2s -> 3 chunks
+
+
+
     chunks = AudioProcessor.process_for_transcription(
-        real_audio_file, 
-        limit_mb=10, 
-        segment_time=1800,
+
+
+
+        real_audio_file,
+
+
+
+        segment_time=2,
+
+
+
         output_dir=str(tmp_path)
+
+
+
     )
-    
-    assert len(chunks) >= 1
-    assert "prepared" in chunks[0]
-    for chunk in chunks:
-        assert os.path.exists(chunk)
+
+
+
+    assert len(chunks) >= 3
+
+
+
+
+
+
+
+    # 5s file, segment_time=10s -> 1 chunk
+
+
+
+    chunks = AudioProcessor.process_for_transcription(
+
+
+
+        real_audio_file,
+
+
+
+        segment_time=10,
+
+
+
+        output_dir=str(tmp_path)
+
+
+
+    )
+
+
+
+    assert len(chunks) == 1
+
+
+
+
+
+
+
+def test_reencode_failure(tmp_path):
+
+
+
+    """Test handling of re-encoding failure."""
+
+
+
+    # Pass a non-existent file
+
+
+
+    success = AudioProcessor.reencode_to_optimal("nonexistent.mp3", str(tmp_path / "failed.mp3"))
+
+
+
+    assert success is False
+
+
+
+
+
+
+
+def test_remove_silence_failure(tmp_path):
+
+
+
+    """Test handling of silence removal failure."""
+
+
+
+    # Pass a non-existent file
+
+
+
+    success = AudioProcessor.remove_silence("nonexistent.mp3", str(tmp_path / "failed.mp3"))
+
+
+
+    assert success is False
+
+
+
+
+
+
+
+

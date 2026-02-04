@@ -17,9 +17,10 @@ The "Class-to-Notes Engine" is a Linux CLI tool designed to automate the convers
 -   **Automated Retry Logic:** Automatically retries failed or interrupted jobs (e.g., from network issues or browser crashes).
 -   **Media Download:** Downloads audio/video content for processing using yt-dlp.
 -   **AI-Powered Generation:** Utilizes the Gemini API (gemini-2.5-flash and gemini-3-flash-preview) for transcription and note generation.
--   **API Key Management:** Robust system for managing multiple Gemini API keys with quota tracking and automatic key cycling.
--   **Smart Chunking:** Configurable audio splitting and 10-second delays between processing to respect API rate limits.
--   **Clean Output:** Saves final notes as raw Markdown files in a dedicated `notes/` directory.
+- **API Key Management:** Robust system for managing multiple Gemini API keys with quota tracking and automatic key cycling.
+- **Smart Chunking:** Duration-based audio splitting (using configurable `segment_time`) and 10-second delays between processing to respect API rate limits.
+- **Dynamic Resource Scaling:** Automatically detects system CPU/RAM to optimize FFmpeg processing speed (low, balanced, high modes).
+- **Clean Output:** Saves final notes as raw Markdown files in a dedicated `notes/` directory.
 -   **TUI (Planned):** A terminal user interface for seamless interaction.
 
 ## Target Audience

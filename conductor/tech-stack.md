@@ -21,4 +21,5 @@
 ## Key Dependencies
 - `google-genai`: Python library for Gemini API interaction.
 - `yt-dlp`: For video metadata and audio extraction.
+- `ffmpeg/ffprobe`: For audio processing, duration retrieval, and silent part removal.
 - `pytest`: For automated testing.

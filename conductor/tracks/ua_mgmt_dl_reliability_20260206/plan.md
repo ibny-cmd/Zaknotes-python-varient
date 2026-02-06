@@ -25,12 +25,12 @@
     - [x] Ensure directory structure preservation (keeping `.gitkeep`).
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Cleanup Service Improvement' (Protocol in workflow.md)
 
-## Phase 4: Download Reliability Fixes
+## Phase 4: Download Reliability Fixes [checkpoint: e81121a]
 - [x] Task: Adjust YouTube download command in `src/downloader.py`. b8dc01c
     - [x] Remove or reduce `-N 16` concurrency for YouTube domain to avoid 403 errors.
 - [x] Task: Update EdgeCourseBD/Vimeo download commands in `src/downloader.py`. b8dc01c
     - [x] Inject `--downloader ffmpeg --hls-use-mpegts` for these domains to handle HLS streams correctly.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Download Reliability Fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Download Reliability Fixes' (Protocol in workflow.md)
 
 ## Phase 5: Documentation
 - [ ] Task: Update `README.md` with comprehensive troubleshooting for download errors.

@@ -4,22 +4,31 @@ Zaknotes is a powerful Linux CLI tool designed for students and learners who wan
 
 ---
 
-## 🛠 Arch Linux Installation & Prerequisites
+## 🛠 Installation & Prerequisites
 
-Zaknotes is optimized for Arch Linux. Follow these steps to set up your environment:
+Zaknotes is optimized for Linux (Arch and Ubuntu). Follow these steps to set up your environment:
 
 ### 1. Install System Dependencies
-Zaknotes requires `ffmpeg` for audio processing and `nodejs` to solve YouTube's "n challenge" via the EJS solver.
 
+#### **Arch Linux:**
 ```bash
-sudo pacman -S ffmpeg nodejs
+sudo pacman -Syu ffmpeg nodejs
+```
+
+#### **Ubuntu/Debian:**
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ffmpeg nodejs npm
 ```
 
 ### 2. Install UV (Modern Python Package Manager)
-We use `uv` for lightning-fast dependency management and virtual environments.
+We use `uv` for lightning-fast dependency management.
 
 ```bash
-sudo pacman -S uv
+# Official installation script
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Or via wget
+wget -qO- https://astral.sh/uv/install.sh | sh
 ```
 
 ### 3. Clone & Setup

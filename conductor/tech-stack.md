@@ -23,3 +23,4 @@
 - `yt-dlp`: For video metadata and audio extraction.
 - `ffmpeg/ffprobe`: For audio processing, duration retrieval, and silent part removal.
 - `pytest`: For automated testing.
+- `urllib.parse`: Python standard library for domain and URL parsing.

@@ -32,7 +32,7 @@
     - [x] Inject `--downloader ffmpeg --hls-use-mpegts` for these domains to handle HLS streams correctly.
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Download Reliability Fixes' (Protocol in workflow.md)
 
-## Phase 5: Documentation
+## Phase 5: Documentation [checkpoint: e7ca714]
 - [x] Task: Update `README.md` with comprehensive troubleshooting for download errors. 1ce8bae
     - [x] Add sections for 403 Forbidden, HLS stream issues, and general `yt-dlp` tips.
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Documentation' (Protocol in workflow.md)

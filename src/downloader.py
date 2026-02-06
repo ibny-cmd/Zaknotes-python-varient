@@ -84,8 +84,9 @@ def download_audio(job):
     # 2. YOUTUBE
     elif any(x in url for x in ["youtube.com", "youtu.be", "youtube-nocookie.com"]):
         print(">> Mode: YouTube")
+        # Reduced concurrency for YouTube to avoid 403
         cmd = (
-            f'{YT_DLP_BASE} {CONCURRENCY} {EJS_ARGS} '
+            f'{YT_DLP_BASE} -N 4 {EJS_ARGS} '
             f'-f "{SMART_FORMAT}" '
             f'--extract-audio --audio-format mp3 --audio-quality 5 '
             f'--continue {cookie_arg} {paths_arg} '
@@ -129,8 +130,10 @@ def download_audio(job):
             vimeo_url = run_command(scraper_cmd)
             print(f"   Found Vimeo URL: {vimeo_url}")
             
+            # Use ffmpeg for HLS streams from EdgeCourseBD
             cmd = (
                 f'{YT_DLP_BASE} {CONCURRENCY} {EJS_ARGS} --no-part --no-keep-fragments '
+                f'--downloader ffmpeg --hls-use-mpegts '
                 f'--referer "{url}" '
                 f'{cookie_arg} {paths_arg} '
                 f'-f "{SMART_FORMAT}" '

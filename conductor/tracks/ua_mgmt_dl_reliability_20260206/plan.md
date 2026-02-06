@@ -1,13 +1,13 @@
 # Implementation Plan - User-Agent Management & Download Reliability Improvements
 
-## Phase 1: Configuration and UI
+## Phase 1: Configuration and UI [checkpoint: 1972c0e]
 - [x] Task: Update `ConfigManager` to support `user_agent` with a default value. f1337fb
-    - [ ] Add `user_agent` to `DEFAULT_CONFIG` in `src/config_manager.py`.
-    - [ ] Ensure it persists correctly in `config.json`.
+    - [x] Add `user_agent` to `DEFAULT_CONFIG` in `src/config_manager.py`.
+    - [x] Ensure it persists correctly in `config.json`.
 - [x] Task: Implement `configure_user_agent` in `zaknotes.py` and add it to the main menu. cde215d
-    - [ ] Create a new function `configure_user_agent()` similar to `configure_audio_chunking()`.
-    - [ ] Add the option to the `main_menu()`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Configuration and UI' (Protocol in workflow.md)
+    - [x] Create a new function `configure_user_agent()` similar to `configure_audio_chunking()`.
+    - [x] Add the option to the `main_menu()`.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Configuration and UI' (Protocol in workflow.md)
 
 ## Phase 2: User-Agent Integration
 - [ ] Task: Modify `src/downloader.py` to fetch User-Agent from `ConfigManager` and apply it to all `yt-dlp` templates.

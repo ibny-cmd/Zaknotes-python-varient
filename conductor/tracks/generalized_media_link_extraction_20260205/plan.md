@@ -6,7 +6,7 @@
 - [x] Task: Implement interactive selection with timeout in `link_extractor.py`. d3c32e9
 - [x] Task: Generalize cookie loading in `link_extractor.py` to load all cookies without domain filtering. d3c32e9
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Link Extractor Generalization' (Protocol in workflow.md) d3c32e9
-- [~] Task: Remove -yt and -md logic and tests from Phase 1.
+- [x] Task: Remove -yt and -md logic and tests from Phase 1. 65114de
 
 ## Phase 2: Downloader Refactor and Enhancement (TDD)
 - [ ] Task: Update `JobManager` in `src/job_manager.py` to support `no_link_found` status and filter it out.

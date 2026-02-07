@@ -52,6 +52,10 @@ class GeminiAPIWrapper:
                 if e.code == 429:
                     self.key_manager.mark_exhausted(api_key, model_name)
                     continue
+                if e.code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
             except httpx.HTTPStatusError as e:
                 duration = time.time() - start_time
@@ -59,10 +63,20 @@ class GeminiAPIWrapper:
                 if e.response.status_code == 429:
                     self.key_manager.mark_exhausted(api_key, model_name)
                     continue
+                if e.response.status_code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
             except Exception as e:
                 duration = time.time() - start_time
                 logger.error(f"Gemini API Response - Exception - Duration: {duration:.2f}s - Error: {str(e)}")
+                # Check for 503 in general exceptions
+                code = getattr(e, 'code', getattr(getattr(e, 'response', None), 'status_code', None))
+                if code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
 
     def generate_content_with_file(self, file_path, prompt, model_type="transcription"):
@@ -100,6 +114,10 @@ class GeminiAPIWrapper:
                 if e.code == 429:
                     self.key_manager.mark_exhausted(api_key, model_name)
                     continue
+                if e.code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
             except httpx.HTTPStatusError as e:
                 duration = time.time() - start_time
@@ -107,10 +125,20 @@ class GeminiAPIWrapper:
                 if e.response.status_code == 429:
                     self.key_manager.mark_exhausted(api_key, model_name)
                     continue
+                if e.response.status_code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
             except Exception as e:
                 duration = time.time() - start_time
                 logger.error(f"Gemini API Response - Exception - Duration: {duration:.2f}s - Error: {str(e)}")
+                # Check for 503 in general exceptions
+                code = getattr(e, 'code', getattr(getattr(e, 'response', None), 'status_code', None))
+                if code == 503:
+                    logger.warning("Model overloaded (503). Waiting 10 minutes before retry...")
+                    time.sleep(600)
+                    continue
                 raise
 
     def _wait_for_file_active(self, client, file_obj):

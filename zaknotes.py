@@ -2,7 +2,16 @@
 import os
 import sys
 import shutil
+import logging
 from src.job_manager import JobManager
+
+# Configure logging to show INFO level and above on terminal
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s: %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 from src.cookie_manager import interactive_update as refresh_cookies
 from src.api_key_manager import APIKeyManager
 from src.config_manager import ConfigManager

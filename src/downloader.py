@@ -44,6 +44,11 @@ def run_command(cmd_str):
         raise Exception(process.stderr)
     return process.stdout.strip()
 
+def get_expected_audio_path(job):
+    name = job['name']
+    safe_name = name.replace(" ", "_").replace("/", "-")
+    return os.path.join(DOWNLOAD_DIR, f"{safe_name}.mp3")
+
 def download_audio(job):
     url = job['url']
     name = job['name']

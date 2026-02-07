@@ -1,3 +1,5 @@
+[tool.uv]
+resolution = "highest"
 [project]
 name = "zaknotes-python-varient"
 version = "0.1.0"
@@ -36,6 +38,6 @@ dependencies = [
     "urllib3==2.6.2",
     "websocket-client==1.9.0",
     "websockets==15.0.1",
-    "yt-dlp==2025.12.8",
-    "yt-dlp-ejs==0.3.2",
+    "yt-dlp>=2025.12.8",
+    "yt-dlp-ejs>=0.3.2",
 ]

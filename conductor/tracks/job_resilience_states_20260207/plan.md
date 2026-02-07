@@ -10,8 +10,8 @@ Goal: Improve transparency and accuracy of API usage and responses.
 ## Phase 2: Granular State Tracking
 Goal: Implement persistent intermediate states in the job management system.
 
-- [ ] Task: Update `JobManager` state definitions to include intermediate processing steps (DOWNLOADED, CHUNKED, etc.).
-- [ ] Task: Implement per-chunk transcription state tracking in `JobManager`.
+- [x] Task: Update `JobManager` state definitions to include intermediate processing steps (DOWNLOADED, CHUNKED, etc.). e3bfc45
+- [x] Task: Implement per-chunk transcription state tracking in `JobManager`. e3bfc45
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Granular State Tracking' (Protocol in workflow.md)
 
 ## Phase 3: Pipeline Resumption Logic

@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 from src.downloader import download_audio, get_expected_audio_path
 from src.audio_processor import AudioProcessor
 from src.note_generation_service import NoteGenerationService
@@ -30,17 +31,17 @@ class ProcessingPipeline:
             os.makedirs(temp_dir, exist_ok=True)
 
         try:
-            # 1. Download (Skip if status >= DOWNLOADED or file exists)
+            # 1. Download
             audio_path = get_expected_audio_path(job)
             skip_download = False
-            if job.get('status') in ['DOWNLOADED', 'SILENCE_REMOVED', 'BITRATE_MODIFIED', 'CHUNKED'] or job.get('status', '').startswith('TRANSCRIBING_CHUNK_'):
+            ready_states = ['DOWNLOADED', 'SILENCE_REMOVED', 'BITRATE_MODIFIED', 'CHUNKED']
+            if job.get('status') in ready_states or job.get('status', '').startswith('TRANSCRIBING_CHUNK_'):
                 if os.path.exists(audio_path):
                     print(f"⏩ Skipping download: {audio_path} already exists.")
                     skip_download = True
             elif os.path.exists(audio_path):
-                # Even if status is not set, if file exists we might want to skip or at least be aware
                 print(f"⏩ Audio file {audio_path} already exists. Skipping download and setting status to DOWNLOADED.")
-                job['status'] = 'DOWNLOADED' # Update in-memory object
+                job['status'] = 'DOWNLOADED'
                 self.manager.update_job_status(job['id'], 'DOWNLOADED')
                 skip_download = True
             
@@ -55,40 +56,70 @@ class ProcessingPipeline:
                 self.manager.update_job_status(job['id'], 'DOWNLOADED')
                 job['status'] = 'DOWNLOADED'
 
-            # 2. Audio Processing (Skip if status >= CHUNKED)
-            skip_processing = False
-            if job.get('status') in ['CHUNKED'] or job.get('status', '').startswith('TRANSCRIBING_CHUNK_'):
-                # Try to find existing chunks using job ID
+            # 2. Audio Processing (Granular steps)
+            base_name = os.path.splitext(os.path.basename(audio_path))[0]
+            extension = os.path.splitext(audio_path)[1] or ".mp3"
+            prepared_path = os.path.join(temp_dir, f"{base_name}_prepared{extension}")
+            
+            # 2.1 Silence Removal & Bitrate (Combined for simplicity in state)
+            if job.get('status') == 'DOWNLOADED':
+                print(f"✂️ [2/4] Processing audio (silence removal & bitrate): {audio_path}")
+                if not os.path.exists(prepared_path):
+                    silence_removed_path = prepared_path + ".nosilence" + extension
+                    if AudioProcessor.remove_silence(audio_path, silence_removed_path):
+                        if AudioProcessor.reencode_to_optimal(silence_removed_path, prepared_path):
+                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                            job['status'] = 'BITRATE_MODIFIED'
+                        else:
+                            shutil.copy2(silence_removed_path, prepared_path)
+                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                            job['status'] = 'BITRATE_MODIFIED'
+                        try: os.remove(silence_removed_path)
+                        except: pass
+                    else:
+                        if AudioProcessor.reencode_to_optimal(audio_path, prepared_path):
+                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                            job['status'] = 'BITRATE_MODIFIED'
+                        else:
+                            shutil.copy2(audio_path, prepared_path)
+                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                            job['status'] = 'BITRATE_MODIFIED'
+                else:
+                    print(f"⏩ Prepared audio already exists.")
+                    self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                    job['status'] = 'BITRATE_MODIFIED'
+
+            # 2.2 Chunking
+            if job.get('status') == 'BITRATE_MODIFIED':
                 chunks = sorted([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if f.startswith(f"job_{job['id']}_chunk_")])
-                if chunks:
-                    print(f"⏩ Skipping audio processing: {len(chunks)} chunk(s) found in {temp_dir}.")
-                    skip_processing = True
-            
-            if not skip_processing:
-                print(f"✂️ [2/4] Checking size and splitting audio: {audio_path}")
-                self.manager.update_job_status(job['id'], 'processing')
-                
-                segment_time = self.config.get("segment_time", 1800)
-                profile = self.config.get("performance_profile", "balanced")
-                threads = 0
-                if profile == "low": threads = 1
-                elif profile == "high": threads = 0
-                
-                # We'll use a specific pattern including job ID
-                extension = os.path.splitext(audio_path)[1] or ".mp3"
-                output_pattern = os.path.join(temp_dir, f"job_{job['id']}_chunk_%03d{extension}")
+                if not chunks:
+                    print(f"✂️ Splitting audio into chunks...")
+                    segment_time = self.config.get("segment_time", 1800)
+                    output_pattern = os.path.join(temp_dir, f"job_{job['id']}_chunk_%03d{extension}")
                     
-                chunks = AudioProcessor.process_for_transcription(
-                    audio_path, 
-                    segment_time=segment_time,
-                    output_dir=temp_dir,
-                    threads=threads,
-                    output_pattern=output_pattern # Pass custom pattern
-                )
-                print(f"   - Audio split into {len(chunks)} chunk(s).")
-                self.manager.update_job_status(job['id'], 'CHUNKED')
-                job['status'] = 'CHUNKED'
+                    duration = AudioProcessor.get_duration(prepared_path)
+                    if duration <= segment_time:
+                        print(f"   - Duration {duration:.2f}s is within limit. No splitting needed.")
+                        single_chunk = os.path.join(temp_dir, f"job_{job['id']}_chunk_001{extension}")
+                        shutil.copy2(prepared_path, single_chunk)
+                        chunks = [single_chunk]
+                    else:
+                        chunks = AudioProcessor.split_into_chunks(prepared_path, output_pattern, segment_time)
+                    
+                    self.manager.update_job_status(job['id'], 'CHUNKED')
+                    job['status'] = 'CHUNKED'
+                else:
+                    print(f"⏩ Skipping chunking: {len(chunks)} chunk(s) already exist.")
+                    self.manager.update_job_status(job['id'], 'CHUNKED')
+                    job['status'] = 'CHUNKED'
             
+            if not chunks and (job.get('status') == 'CHUNKED' or job.get('status', '').startswith('TRANSCRIBING_CHUNK_')):
+                chunks = sorted([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if f.startswith(f"job_{job['id']}_chunk_")])
+                if not chunks:
+                    print(f"❌ Error: Status is {job['status']} but no chunks found for job {job['id']}")
+                    self.manager.update_job_status(job['id'], 'failed')
+                    return False
+
             # 3. Transcription
             print(f"📝 [3/4] Transcribing {len(chunks)} chunks using Gemini...")
             transcript_path = os.path.join(temp_dir, f"{job['id']}_transcript.txt")

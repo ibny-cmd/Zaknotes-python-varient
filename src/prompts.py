@@ -107,4 +107,14 @@ OUTPUT STYLE (STRICT)
 - Structured, continuous notes with clear headings.
 """
 
-TRANSCRIPTION_PROMPT = r"Transcribe this audio exactly as spoken. Output *only* the transcript text, no explanation, no translation."
+TRANSCRIPTION_PROMPT = r"""Act as a high-fidelity transcription agent.
+
+TRANSCRIPTION RULES:
+1. Clean Verbatim: Remove filler words (ums, ahs, you knows, like, basically, etc.) but keep ALL meaningful academic content.
+2. Language Preservation:
+   - Transcribe the audio in its original language.
+   - If the audio is in Bangla, transcribe it in Bangla script.
+   - If terms, numbers, or phrases are spoken in English (common in academic Bangla), transcribe them using English characters. Do NOT translate or transliterate English terms into Bangla script.
+3. Accuracy: Ensure technical terms and formulas are captured precisely as spoken.
+4. Strict Output: Output ONLY the transcript text. No greetings, no explanations, and no meta-commentary.
+"""

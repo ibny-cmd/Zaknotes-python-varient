@@ -20,10 +20,12 @@ class NoteGenerationService:
             with open(transcript_path, 'r', encoding='utf-8') as f:
                 transcript_content = f.read()
             
-            full_prompt = f"{prompt_text}\n\nTRANSCRIPT:\n{transcript_content}"
-            
             api = GeminiAPIWrapper()
-            notes = api.generate_content(full_prompt, model_type="note")
+            notes = api.generate_content(
+                prompt=f"TRANSCRIPT:\n{transcript_content}",
+                model_type="note",
+                system_instruction=prompt_text
+            )
             
             if notes:
                 out_dir = os.path.dirname(output_path)

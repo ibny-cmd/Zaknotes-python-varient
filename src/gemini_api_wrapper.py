@@ -23,7 +23,7 @@ class GeminiAPIWrapper:
         
         return genai.Client(api_key=api_key), api_key
 
-    def generate_content(self, prompt, model_type="note"):
+    def generate_content(self, prompt, model_type="note", system_instruction=None):
         model_name = self.MODELS.get(model_type, self.MODELS["note"])
         
         while True:
@@ -33,13 +33,18 @@ class GeminiAPIWrapper:
             
             masked_key = api_key[:4] + "..." + api_key[-4:] if len(api_key) > 8 else "****"
             logger.info(f"Gemini API Request - Type: {model_type}, Model: {model_name}, Key: {masked_key}")
+            if system_instruction:
+                logger.info(f"System Instruction (truncated): {str(system_instruction)[:100]}...")
             logger.info(f"Prompt (truncated): {str(prompt)[:100]}...")
             
             start_time = time.time()
             try:
                 response = client.models.generate_content(
                     model=model_name,
-                    contents=prompt
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction
+                    ) if system_instruction else None
                 )
                 duration = time.time() - start_time
                 text_out = response.text or ""
@@ -79,7 +84,7 @@ class GeminiAPIWrapper:
                     continue
                 raise
 
-    def generate_content_with_file(self, file_path, prompt, model_type="transcription"):
+    def generate_content_with_file(self, file_path, prompt, model_type="transcription", system_instruction=None):
         model_name = self.MODELS.get(model_type, self.MODELS["transcription"])
         
         while True:
@@ -89,6 +94,8 @@ class GeminiAPIWrapper:
             
             masked_key = api_key[:4] + "..." + api_key[-4:] if len(api_key) > 8 else "****"
             logger.info(f"Gemini API Request (with file) - Type: {model_type}, Model: {model_name}, Key: {masked_key}, File: {file_path}")
+            if system_instruction:
+                logger.info(f"System Instruction (truncated): {str(system_instruction)[:100]}...")
             logger.info(f"Prompt (truncated): {str(prompt)[:100]}...")
 
             start_time = time.time()
@@ -101,7 +108,10 @@ class GeminiAPIWrapper:
                 logger.info(f"Generating content for file: {file_obj.name}")
                 response = client.models.generate_content(
                     model=model_name,
-                    contents=[file_obj, prompt]
+                    contents=[file_obj, prompt],
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction
+                    ) if system_instruction else None
                 )
                 duration = time.time() - start_time
                 text_out = response.text or ""

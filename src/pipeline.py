@@ -165,8 +165,9 @@ class ProcessingPipeline:
                 try:
                     text = self.api.generate_content_with_file(
                         file_path=chunk,
-                        prompt=TRANSCRIPTION_PROMPT,
-                        model_type="transcription"
+                        prompt="Please transcribe this audio chunk.",
+                        model_type="transcription",
+                        system_instruction=TRANSCRIPTION_PROMPT
                     )
                     if text:
                         with open(transcript_path, 'a', encoding='utf-8') as f:

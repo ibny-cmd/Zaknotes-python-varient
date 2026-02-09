@@ -12,6 +12,7 @@ class APIKeyManager:
     def __init__(self, keys_file=None):
         self.keys_file = keys_file or self.DEFAULT_KEYS_FILE
         self.data = self._load_data()
+        self.last_key_index = -1
 
     def _load_data(self):
         if os.path.exists(self.keys_file):
@@ -78,12 +79,22 @@ class APIKeyManager:
     def get_available_key(self, model):
         self.reset_quotas_if_needed()
         
-        for k in self.data["keys"]:
+        num_keys = len(self.data["keys"])
+        if num_keys == 0:
+            return None
+
+        # Start searching from the next key after last_key_index
+        for i in range(1, num_keys + 1):
+            idx = (self.last_key_index + i) % num_keys
+            k = self.data["keys"][idx]
+            
             usage = k["usage"].get(model, 0)
             exhausted = k.get("exhausted", {}).get(model, False)
             
             if not exhausted and usage < self.QUOTA_LIMIT:
+                self.last_key_index = idx
                 return k["key"]
+        
         return None
 
     def get_status_report(self):

@@ -20,7 +20,8 @@ The "Class-to-Notes Engine" is a Linux CLI tool designed to automate the convers
 - **Customizable Browser Identity:** Allows users to configure a custom Browser User-Agent to improve compatibility and avoid rate-limiting on platforms like YouTube.
 - **AI-Powered Generation:** Utilizes the Gemini API (gemini-2.5-flash and gemini-3-flash-preview) for transcription and note generation with optimized system instructions.
 - **Enhanced Transcription Accuracy:** Updated transcription prompts to enforce "Clean Verbatim" output, removing filler words while strictly preserving meaningful academic content and maintaining the original language (e.g., Bangla/English code-switching).
-- **API Key Management:** Robust system for managing multiple Gemini API keys with quota tracking and automatic key cycling.
+- **API Request Reliability:** Robust timeout and retry mechanism for all API calls, with mandatory round-robin key rotation to ensure high availability and prevent single-key rate-limiting.
+- **API Key Management:** Robust system for managing multiple Gemini API keys with quota tracking, mandatory rotation, and automatic key cycling on exhaustion.
 - **Smart Chunking:** Duration-based audio splitting (using configurable `segment_time`) and 10-second delays between processing to respect API rate limits.
 -   **Interactive Workspace Cleanup:** Provides granular control over temporary files, allowing users to purge everything or target only completed/cancelled jobs.
 - **Dynamic Resource Scaling:** Automatically detects system CPU/RAM to optimize FFmpeg processing speed (low, balanced, high modes).

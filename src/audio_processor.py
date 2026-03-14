@@ -162,39 +162,53 @@ class AudioProcessor:
             return []
 
     @staticmethod
+    def optimize_audio(input_path: str, output_path: str, bitrate: str = "48k", threshold_db: int = -50, threads: int = 0) -> bool:
+        """
+        Performs silence removal, bitrate optimization, mono conversion, and sample rate adjustment
+        in a SINGLE ffmpeg pass.
+        """
+        try:
+            print(f"      - Optimizing audio (silence removal, mono, {bitrate}, 16kHz, threads={threads})...")
+            # Filter for silence removal
+            af_filter = f"silenceremove=stop_periods=-1:stop_duration=1:stop_threshold={threshold_db}dB"
+            
+            command = [
+                "ffmpeg", "-y", "-threads", str(threads), "-i", input_path,
+                "-af", af_filter,
+                "-b:a", bitrate,
+                "-ac", "1",      # Mono
+                "-ar", "16000",  # 16kHz
+                output_path
+            ]
+            subprocess.run(command, check=True, capture_output=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"      ❌ Error during audio optimization: {e.stderr.decode('utf-8', errors='replace')}")
+            return False
+
+    @staticmethod
     def process_for_transcription(input_path: str, max_size_mb: int = 15, output_dir: str = "temp", threads: int = 0, output_pattern: str = None) -> List[str]:
         """
-        Orchestrates the audio processing using duration-based chunking.
+        Orchestrates the audio processing: optimizes and then splits if needed.
         """
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
 
-        # 1. First, always remove silence and re-encode to optimal bitrate
-        print(f"   - Preparing audio for transcription...")
+        # 1. Optimize audio in a SINGLE pass
+        print(f"   - Preparing and optimizing audio for transcription...")
         base_name = os.path.splitext(os.path.basename(input_path))[0]
         extension = os.path.splitext(input_path)[1] or ".mp3"
         
         prepared_path = os.path.join(output_dir, f"{base_name}_prepared{extension}")
         
-        # Intermediate path for silence removal
-        silence_removed_path = prepared_path + ".nosilence" + extension
-        if AudioProcessor.remove_silence(input_path, silence_removed_path, threads=threads):
-            if not AudioProcessor.reencode_to_optimal(silence_removed_path, prepared_path, threads=threads):
-                # If re-encoding fails, use silence removed version
-                shutil.copy2(silence_removed_path, prepared_path)
-            try: os.remove(silence_removed_path)
-            except: pass
-        else:
-            # If silence removal fails, try re-encoding original
-            if not AudioProcessor.reencode_to_optimal(input_path, prepared_path, threads=threads):
-                # If both fail, use original
-                shutil.copy2(input_path, prepared_path)
+        if not AudioProcessor.optimize_audio(input_path, prepared_path, threads=threads):
+            # If optimization fails, try a simple copy as fallback
+            print(f"      ⚠️ Optimization failed. Using original file as fallback.")
+            shutil.copy2(input_path, prepared_path)
 
         # 2. Check size and split if needed
         if AudioProcessor.is_under_limit(prepared_path, max_size_mb):
             print(f"   - Processed file size is within limit ({max_size_mb} MB).")
-            # Copy to match pattern for consistency if needed, but here we can just return it
-            # To be consistent with split_by_size return, let's copy it
             if not output_pattern:
                 output_pattern = os.path.join(output_dir, f"{base_name}_chunk_%03d{extension}")
             

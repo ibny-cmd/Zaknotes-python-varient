@@ -84,8 +84,7 @@ def test_execute_job_success(mock_job_manager_class, mock_shutil, mock_os, mock_
         mock_down.assert_not_called()
         
         # Verify processing
-        mock_audio_class.remove_silence.assert_called()
-        mock_audio_class.reencode_to_optimal.assert_called()
+        mock_audio_class.optimize_audio.assert_called()
         
         # Verify API call with system_instruction
         mock_api.generate_content_with_file.assert_called()

@@ -47,7 +47,8 @@ def test_execute_local_job_success(mock_job_manager_class, mock_shutil, mock_os,
     mock_os.path.splitext = os.path.splitext
     
     # AudioProcessor mocks
-    mock_audio_class.process_for_transcription.return_value = ["temp/chunk_1.mp3"]
+    mock_audio_class.optimize_audio.return_value = True
+    mock_os.listdir.return_value = ["job_local_123_chunk_001.mp3"]
     
     # API mocks
     mock_api = mock_api_class.return_value

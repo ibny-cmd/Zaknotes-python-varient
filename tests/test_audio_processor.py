@@ -140,22 +140,30 @@ def test_reencode_failure(tmp_path):
 
 
 
-def test_remove_silence_failure(tmp_path):
+def test_optimize_audio(real_audio_file, tmp_path):
+    """Test single-pass audio optimization."""
+    output_file = str(tmp_path / "optimized.mp3")
+    success = AudioProcessor.optimize_audio(real_audio_file, output_file, bitrate="32k")
+    assert success is True
+    assert os.path.exists(output_file)
+    
+    # Verify mono and sample rate (16000)
+    command = [
+        "ffprobe", "-v", "error", "-select_streams", "a:0",
+        "-show_entries", "stream=channels,sample_rate", "-of", "default=noprint_wrappers=1:nokey=1",
+        output_file
+    ]
+    result = subprocess.run(command, check=True, capture_output=True, text=True)
+    output = result.stdout.strip().split("\n")
+    # ffprobe output order observed: sample_rate, then channels
+    sample_rate = int(output[0])
+    channels = int(output[1])
+    assert sample_rate == 16000
+    assert channels == 1
 
-
-
-    """Test handling of silence removal failure."""
-
-
-
-    # Pass a non-existent file
-
-
-
-    success = AudioProcessor.remove_silence("nonexistent.mp3", str(tmp_path / "failed.mp3"))
-
-
-
+def test_optimize_audio_failure(tmp_path):
+    """Test handling of optimization failure."""
+    success = AudioProcessor.optimize_audio("nonexistent.mp3", str(tmp_path / "failed.mp3"))
     assert success is False
 
 

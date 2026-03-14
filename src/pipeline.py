@@ -79,29 +79,17 @@ class ProcessingPipeline:
             extension = os.path.splitext(audio_path)[1] or ".mp3"
             prepared_path = os.path.join(temp_dir, f"{base_name}_prepared{extension}")
             
-            # 2.1 Silence Removal & Bitrate (Combined for simplicity in state)
+            # 2.1 Optimization (Silence, Bitrate, Mono, 16kHz)
             if job.get('status') == 'DOWNLOADED':
-                print(f"✂️ [2/4] Processing audio (silence removal & bitrate): {audio_path}")
+                print(f"✂️ [2/4] Optimizing audio (single pass): {audio_path}")
                 if not os.path.exists(prepared_path):
-                    silence_removed_path = prepared_path + ".nosilence" + extension
-                    if AudioProcessor.remove_silence(audio_path, silence_removed_path):
-                        if AudioProcessor.reencode_to_optimal(silence_removed_path, prepared_path):
-                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
-                            job['status'] = 'BITRATE_MODIFIED'
-                        else:
-                            shutil.copy2(silence_removed_path, prepared_path)
-                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
-                            job['status'] = 'BITRATE_MODIFIED'
-                        try: os.remove(silence_removed_path)
-                        except: pass
+                    if AudioProcessor.optimize_audio(audio_path, prepared_path):
+                        self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                        job['status'] = 'BITRATE_MODIFIED'
                     else:
-                        if AudioProcessor.reencode_to_optimal(audio_path, prepared_path):
-                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
-                            job['status'] = 'BITRATE_MODIFIED'
-                        else:
-                            shutil.copy2(audio_path, prepared_path)
-                            self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
-                            job['status'] = 'BITRATE_MODIFIED'
+                        shutil.copy2(audio_path, prepared_path)
+                        self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')
+                        job['status'] = 'BITRATE_MODIFIED'
                 else:
                     print(f"⏩ Prepared audio already exists.")
                     self.manager.update_job_status(job['id'], 'BITRATE_MODIFIED')

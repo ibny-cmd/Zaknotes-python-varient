@@ -76,8 +76,8 @@ class ProcessingPipeline:
 
             # 2. Audio Processing (Granular steps)
             base_name = os.path.splitext(os.path.basename(audio_path))[0]
-            extension = os.path.splitext(audio_path)[1] or ".mp3"
-            prepared_path = os.path.join(temp_dir, f"{base_name}_prepared{extension}")
+            # Use .mp3 extension for prepared file to ensure compatibility and trigger conversion
+            prepared_path = os.path.join(temp_dir, f"{base_name}_prepared.mp3")
             
             # 2.1 Optimization (Silence, Bitrate, Mono, 16kHz)
             if job.get('status') == 'DOWNLOADED':
@@ -101,7 +101,8 @@ class ProcessingPipeline:
                 if not chunks:
                     print(f"✂️ Splitting audio into chunks based on size...")
                     max_size_mb = self.config.get("max_chunk_size_mb", 15)
-                    output_pattern = os.path.join(temp_dir, f"job_{job['id']}_chunk_%03d{extension}")
+                    # Use .mp3 for chunks
+                    output_pattern = os.path.join(temp_dir, f"job_{job['id']}_chunk_%03d.mp3")
                     
                     chunks = AudioProcessor.process_for_transcription(prepared_path, max_size_mb=max_size_mb, output_dir=temp_dir, output_pattern=output_pattern)
                     

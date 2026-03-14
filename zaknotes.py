@@ -196,11 +196,11 @@ def cleanup_stranded_chunks():
     else:
         print("❌ Invalid choice.")
 
-def run_processing_pipeline(manager):
+def run_processing_pipeline(manager, jobs_to_run=None):
     config = ConfigManager()
     pipeline = ProcessingPipeline(config, job_manager=manager)
     
-    pending_jobs = manager.get_pending_from_last_150()
+    pending_jobs = jobs_to_run if jobs_to_run is not None else manager.get_pending_from_last_150()
     if not pending_jobs:
         print("No pending jobs to process.")
         return
@@ -216,7 +216,10 @@ def run_processing_pipeline(manager):
         
         if not success:
             print(f"⚠️ Job '{job['name']}' failed. Failing all remaining jobs in batch...")
-            manager.fail_pending()
+            # Only fail the remaining jobs in THIS specific batch
+            remaining = pending_jobs[pending_jobs.index(job)+1:]
+            for r_job in remaining:
+                manager.update_job_status(r_job['id'], 'failed')
             break
     
     print("\n🏁 Pipeline execution finished.")
@@ -293,16 +296,16 @@ def start_note_generation():
             file_names = input("Give me the file names (separated by comma/pipe/newline): ")
             urls = input("Give the URLS for the files: ")
             if file_names.strip() and urls.strip():
-                manager.add_jobs(file_names, urls)
-                run_processing_pipeline(manager)
+                new_jobs = manager.add_jobs(file_names, urls)
+                run_processing_pipeline(manager, jobs_to_run=new_jobs)
             break
             
         elif sub_choice == '2':
             file_names = input("Give me the file names (separated by comma/pipe/newline): ")
             urls = input("Give the URLS for the files: ")
             if file_names.strip() and urls.strip():
-                manager.add_jobs(file_names, urls)
-                run_processing_pipeline(manager)
+                new_jobs = manager.add_jobs(file_names, urls)
+                run_processing_pipeline(manager, jobs_to_run=new_jobs)
             break
             
         elif sub_choice == '3':
@@ -454,8 +457,8 @@ def main():
         manager.history.extend(new_jobs)
         manager.save_history()
         
-        # Run pipeline
-        run_processing_pipeline(manager)
+        # Run pipeline ONLY for these local jobs
+        run_processing_pipeline(manager, jobs_to_run=new_jobs)
     else:
         main_menu()
 

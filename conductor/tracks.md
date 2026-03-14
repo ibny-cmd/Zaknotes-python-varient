@@ -9,5 +9,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [x] Track: Fix google-genai Client Initialization Error
-*Link: [./conductor/archive/fix_gemini_client_init_20260212/](./conductor/archive/fix_gemini_client_init_20260212/)*
+---
+
+## [ ] Track: Local Media Processing & Audio Processing Optimization
+*Link: [./tracks/local_media_processing_20260314/](./tracks/local_media_processing_20260314/)*

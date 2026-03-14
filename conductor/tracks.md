@@ -11,5 +11,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [ ] Track: Local Media Processing & Audio Processing Optimization
+## [~] Track: Local Media Processing & Audio Processing Optimization
 *Link: [./tracks/local_media_processing_20260314/](./tracks/local_media_processing_20260314/)*

@@ -1,7 +1,7 @@
 # Implementation Plan: Local Media Processing & Audio Processing Optimization
 
 ## Phase 1: Local File Processing (Scaffolding & Scoping)
-- [ ] Task: Create `uploads/` directory with `.gitkeep`
+- [x] Task: Create `uploads/` directory with `.gitkeep` fbc465d
 - [ ] Task: Update `zaknotes.py` CLI to support `--local` flag
 - [ ] Task: Implement `LocalMediaManager` to list and map files in `uploads/`
 - [ ] Task: Write Tests for `LocalMediaManager` (mapping logic, file listing)

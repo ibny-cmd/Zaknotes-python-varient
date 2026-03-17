@@ -285,6 +285,43 @@ def process_old_notes():
     except Exception as e:
         print(f"❌ Failed to initialize Notion service: {e}")
 
+def process_local_media(names_input: str = None):
+    manager = JobManager()
+    local_manager = LocalMediaManager()
+    
+    # Process names if provided
+    names = []
+    if names_input:
+        import re
+        names = [n.strip() for n in re.split(r'[,|\n]', names_input) if n.strip()]
+
+    mapped_jobs = local_manager.map_files_to_names(names if names else None)
+    
+    if not mapped_jobs:
+        print("❌ No supported media files found in 'uploads/' directory.")
+        return
+
+    print(f"📂 Found {len(mapped_jobs)} local files to process.")
+    
+    # Add to JobManager history
+    from datetime import datetime
+    new_jobs = []
+    for i, job_info in enumerate(mapped_jobs):
+        new_job = {
+            "id": f"local_{datetime.now().timestamp()}_{i}",
+            "name": job_info["name"],
+            "file_path": job_info["file_path"],
+            "status": "queue",
+            "added_at": str(datetime.now())
+        }
+        new_jobs.append(new_job)
+    
+    manager.history.extend(new_jobs)
+    manager.save_history()
+    
+    # Run pipeline ONLY for these local jobs
+    run_processing_pipeline(manager, jobs_to_run=new_jobs)
+
 def start_note_generation():
     manager = JobManager()
     
@@ -292,13 +329,14 @@ def start_note_generation():
         print("\n--- Note Generation Sub-Menu ---")
         print("1. Start New Jobs (Cancel Old Jobs)")
         print("2. Start New Jobs (Add to Queue)")
-        print("3. Cancel All Old Jobs")
-        print("4. Process Queued Jobs")
-        print("5. Process Old Notes (Push to Notion)")
-        print("6. Back to Main Menu")
+        print("3. Process Local Media (uploads/ folder)")
+        print("4. Cancel All Old Jobs")
+        print("5. Process Queued Jobs")
+        print("6. Process Old Notes (Push to Notion)")
+        print("7. Back to Main Menu")
         print("--------------------------------")
         
-        sub_choice = input("Enter your choice (1-6): ").strip()
+        sub_choice = input("Enter your choice (1-7): ").strip()
         
         if sub_choice == '1':
             manager.cancel_pending()
@@ -319,19 +357,24 @@ def start_note_generation():
             break
             
         elif sub_choice == '3':
+            names_input = input("Enter class names for local files (separated by comma/pipe/newline, or leave blank to use filenames): ").strip()
+            process_local_media(names_input if names_input else None)
+            break
+
+        elif sub_choice == '4':
             manager.cancel_pending()
             print("✅ All old jobs cancelled.")
             break
             
-        elif sub_choice == '4':
+        elif sub_choice == '5':
             run_processing_pipeline(manager)
             break
             
-        elif sub_choice == '5':
+        elif sub_choice == '6':
             process_old_notes()
             break
             
-        elif sub_choice == '6':
+        elif sub_choice == '7':
             break
         else:
             print("❌ Invalid choice.")
@@ -439,36 +482,8 @@ def main():
     args, unknown = parser.parse_known_args()
     
     if args.local is not None:
-        manager = JobManager()
-        local_manager = LocalMediaManager()
-        
-        # args.local is a list of strings if provided, or an empty list if --local is used alone
-        mapped_jobs = local_manager.map_files_to_names(args.local)
-        
-        if not mapped_jobs:
-            print("❌ No supported media files found in 'uploads/' directory.")
-            return
-
-        print(f"📂 Found {len(mapped_jobs)} local files to process.")
-        
-        # Add to JobManager history
-        from datetime import datetime
-        new_jobs = []
-        for i, job_info in enumerate(mapped_jobs):
-            new_job = {
-                "id": f"local_{datetime.now().timestamp()}_{i}",
-                "name": job_info["name"],
-                "file_path": job_info["file_path"],
-                "status": "queue",
-                "added_at": str(datetime.now())
-            }
-            new_jobs.append(new_job)
-        
-        manager.history.extend(new_jobs)
-        manager.save_history()
-        
-        # Run pipeline ONLY for these local jobs
-        run_processing_pipeline(manager, jobs_to_run=new_jobs)
+        names_input = "|".join(args.local) if args.local else None
+        process_local_media(names_input)
     else:
         main_menu()
 

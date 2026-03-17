@@ -99,18 +99,24 @@ class ProcessingPipeline:
             if job.get('status') == 'BITRATE_MODIFIED':
                 chunks = sorted([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if f.startswith(f"job_{job['id']}_chunk_")])
                 if not chunks:
-                    print(f"✂️ Splitting audio into chunks based on size...")
+                    segment_time = self.config.get("segment_time", 1800)
+                    print(f"✂️ Splitting audio into chunks based on time ({segment_time}s)...")
                     max_size_mb = self.config.get("max_chunk_size_mb", 15)
                     # Use .mp3 for chunks
                     output_pattern = os.path.join(temp_dir, f"job_{job['id']}_chunk_%03d.mp3")
-                    
-                    chunks = AudioProcessor.process_for_transcription(prepared_path, max_size_mb=max_size_mb, output_dir=temp_dir, output_pattern=output_pattern)
-                    
+
+                    chunks = AudioProcessor.process_for_transcription(
+                        prepared_path, 
+                        segment_time=segment_time,
+                        max_size_mb=max_size_mb, 
+                        output_dir=temp_dir, 
+                        output_pattern=output_pattern
+                    )
+
                     if not chunks:
-                        print(f"❌ Error: Size-based chunking failed to produce chunks for job {job['id']}")
+                        print(f"❌ Error: Chunking failed to produce chunks for job {job['id']}")
                         self.manager.update_job_status(job['id'], 'failed')
                         return False
-
                     self.manager.update_job_status(job['id'], 'CHUNKED')
                     job['status'] = 'CHUNKED'
                 else:

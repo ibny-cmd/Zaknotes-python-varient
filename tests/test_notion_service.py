@@ -137,7 +137,8 @@ def test_notion_service_create_page_retry_on_429(mock_notion_client):
     # Create a mock 429 error
     mock_response = MagicMock()
     mock_response.status_code = 429
-    error_429 = APIResponseError(mock_response, "Rate limit", "rate_limit_reached")
+    error_429 = APIResponseError(mock_response, "Rate limit", "rate_limit_reached", {}, "")
+    error_429.status = 429
     
     # Fail once, then succeed
     mock_instance.databases.retrieve.return_value = {"properties": {"Name": {"type": "title"}}}

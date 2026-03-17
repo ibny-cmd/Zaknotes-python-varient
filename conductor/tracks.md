@@ -13,3 +13,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Local Media Processing & Audio Processing Optimization
 *Link: [./tracks/local_media_processing_20260314/](./tracks/local_media_processing_20260314/)*
+
+---
+
+- [ ] **Track: Reliability, UI, and Local Media Refinements**
+*Link: [./tracks/reliability_ui_refinement_20260317/](./tracks/reliability_ui_refinement_20260317/)*

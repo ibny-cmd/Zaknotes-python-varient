@@ -1,0 +1,8 @@
+{
+  "track_id": "reliability_ui_refinement_20260317",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-03-17T12:00:00Z",
+  "updated_at": "2026-03-17T12:00:00Z",
+  "description": "Bug fix: Currently Zaknotes does not retry when a certain chunk comes empty from gemini at transcription and fails, stopping the workflow. I want it to retry indefinitely subject to the stanard delay when it detects that no text is extracted from a certain chunk. Make sure also it never just proceeds when a certain chunk is empty, even if the workflow is stopped, it should start from that empty chunk when restarted and not just go to the next chunk"
+}

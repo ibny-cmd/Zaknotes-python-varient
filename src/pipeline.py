@@ -156,10 +156,11 @@ class ProcessingPipeline:
                     continue
 
                 if any_success: # If we processed at least one chunk (resumed or new)
-                    print(f"      - Waiting 10s before next chunk...")
-                    time.sleep(10)
-                
+                    print(f"      - Waiting before next chunk...")
+                    self.api.backoff_manager.sync_sleep(0) # Start with base delay
+
                 print(f"      - Processing chunk {chunk_index}/{len(chunks)}...")
+
                 self.manager.update_job_status(job['id'], f'TRANSCRIBING_CHUNK_{chunk_index}')
                 try:
                     text = self.api.generate_content_with_file(
@@ -202,6 +203,10 @@ class ProcessingPipeline:
                 self.manager.update_job_status(job['id'], 'failed')
                 return False
             print(f"   - Notes generated: {final_notes_path}")
+
+            # Optional delay before next phase
+            print(f"      - Waiting before Notion integration...")
+            self.api.backoff_manager.sync_sleep(0) # Base delay
 
             # 5. Notion Integration (Post-generation)
             pushed_to_notion = False

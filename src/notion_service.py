@@ -11,7 +11,12 @@ class NotionService:
         self.client = Client(auth=notion_secret)
         self.database_id = database_id
         self.max_retries = max_retries
-        self.retry_delay = retry_delay
+        # Import BackoffManager to avoid circular dependency if it was in gemini_api_wrapper only
+        from src.gemini_api_wrapper import BackoffManager
+        self.backoff_manager = BackoffManager(
+            initial_delay=float(retry_delay),
+            max_delay=60.0
+        )
 
     def _execute_with_retry(self, func: Callable, *args, **kwargs) -> Any:
         """
@@ -27,9 +32,10 @@ class NotionService:
                     if retries > self.max_retries:
                         logger.error(f"Max retries reached for Notion API (429).")
                         raise
-                    wait_time = self.retry_delay * retries
-                    logger.warning(f"Notion rate limit reached. Retrying in {wait_time}s... (Attempt {retries}/{self.max_retries})")
-                    time.sleep(wait_time)
+                    
+                    delay = self.backoff_manager.get_delay(retries - 1)
+                    logger.warning(f"Notion rate limit reached. Retrying in {delay}s... (Attempt {retries}/{self.max_retries})")
+                    self.backoff_manager.sync_sleep(retries - 1)
                 else:
                     logger.error(f"Notion API error: {e}")
                     raise

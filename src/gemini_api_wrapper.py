@@ -219,6 +219,14 @@ class GeminiAPIWrapper:
                         
                         # Record usage
                         self.usage_tracker.record_usage(auth_record["email"] or "unknown", model_name)
+                        
+                        if not full_text.strip():
+                            logger.warning(f"Empty/whitespace response from Gemini for {auth_record['email']}. Retrying indefinitely...")
+                            await self.backoff_manager.async_sleep(attempt)
+                            # Reset safety to allow indefinite retries for this specific issue
+                            accounts_tried = 0
+                            continue # Retry current account/request
+                            
                         return full_text
 
                 except httpx.TimeoutException:

@@ -11,6 +11,7 @@ class ConfigManager:
         "api_max_retries": 3,
         "api_retry_delay": 10,
         "notion_integration_enabled": False,
+        "rclone_integration_enabled": False,
         "max_chunk_size_mb": 15
     }
 

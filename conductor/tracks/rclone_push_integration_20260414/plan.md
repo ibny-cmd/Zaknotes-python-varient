@@ -1,10 +1,10 @@
 # Implementation Plan: Rclone Remote Pushing Integration
 
 ## Phase 1: Configuration Management
-- [ ] Task: Create `src/rclone_config_manager.py` to manage rclone credentials (remote name and path) stored in `keys/rclone_keys.json`.
-- [ ] Task: Update `ConfigManager` in `src/config_manager.py` to include the `rclone_integration_enabled` flag in `DEFAULT_CONFIG`.
-- [ ] Task: Write unit tests for `RcloneConfigManager` in `tests/test_rclone_config.py`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Configuration Management' (Protocol in workflow.md)
+- [x] Task: Create `src/rclone_config_manager.py` to manage rclone credentials (remote name and path) stored in `keys/rclone_keys.json`. (7281c7d)
+- [x] Task: Update `ConfigManager` in `src/config_manager.py` to include the `rclone_integration_enabled` flag in `DEFAULT_CONFIG`. (076e09b)
+- [x] Task: Write unit tests for `RcloneConfigManager` in `tests/test_rclone_config.py`. (9a60e60)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Configuration Management' (Protocol in workflow.md)
 
 ## Phase 2: Rclone Service Implementation
 - [ ] Task: Create `src/rclone_service.py` implementing a `push_note(local_path, remote_dest)` method using `subprocess.run` to execute `rclone copy`.

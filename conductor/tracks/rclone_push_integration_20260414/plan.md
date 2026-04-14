@@ -19,14 +19,14 @@
 - [x] Task: Update `tests/test_pipeline.py` or create `tests/test_rclone_pipeline.py` to verify the sequential pushing logic. (be74f67)
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Pipeline Integration' (Protocol in workflow.md) (a2ac91d)
 
-## Phase 4: CLI Menu Integration
+## Phase 4: CLI Menu Integration [checkpoint: 8fef007]
 - [x] Task: Implement `manage_rclone_settings()` in `zaknotes.py` to allow users to configure and toggle the Rclone integration. (66048a1)
 - [x] Task: Add a new entry "Manage Rclone Settings" to the `main_menu()` in `zaknotes.py`. (8673322)
 - [x] Task: Implement the warning message when both Rclone and Notion integrations are enabled. (66048a1)
 - [x] Task: Update `tests/test_cli_structure.py` to verify the new menu option and configuration flow. (70b423c)
-- [~] Task: Conductor - User Manual Verification 'Phase 4: CLI Menu Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: CLI Menu Integration' (Protocol in workflow.md) (8fef007)
 
 ## Phase 5: Final Verification
-- [ ] Task: Perform end-to-end manual testing of the complete flow: local generation -> Notion push -> Rclone push.
-- [ ] Task: Verify that enabling/disabling via the menu works as expected and persists correctly.
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Final Verification' (Protocol in workflow.md)
+- [x] Task: Perform end-to-end manual testing of the complete flow: local generation -> Notion push -> Rclone push. (29713c2)
+- [x] Task: Verify that enabling/disabling via the menu works as expected and persists correctly. (29713c2)
+- [~] Task: Conductor - User Manual Verification 'Phase 5: Final Verification' (Protocol in workflow.md)

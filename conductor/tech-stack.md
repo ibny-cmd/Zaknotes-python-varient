@@ -12,6 +12,7 @@
 
 ## External Integrations
 - **Notion API:** Used for automated note storage and organization.
+- **Rclone CLI:** Used for pushing notes to various remote storage destinations.
 - **notion-client:** Official Python SDK for the Notion API.
 
 ## Formatting & Conversion

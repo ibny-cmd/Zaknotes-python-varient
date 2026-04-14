@@ -16,6 +16,7 @@ The "Class-to-Notes Engine" is a Linux CLI tool designed to automate the convers
 - **Enhanced Queue Management:** Provides granular control over job processing, allowing users to start new jobs, cancel tasks, or resume existing queued jobs.
 - **Local Media Processing:** Support for processing local media files placed in the `uploads/` folder via the interactive menu, bypassing the download step.
 - **Automated Notion Integration:** Automatically pushes generated notes to a configured Notion database, converting Markdown to Notion-compatible blocks (including LaTeX math and tables).
+- **Rclone Remote Pushing:** Supports pushing generated notes to various remote storage destinations (Google Drive, S3, etc.) using `rclone` sequentially after generation.
 - **Granular Resumption Logic:** Automatically resumes interrupted jobs from the exact point of failure (e.g., specific transcription chunk) by tracking progress in persistent, job-named intermediate text files.
 - **API Quota & Debug Transparency:** Includes proactive API quota counting and extensive, truncated debug logging for all Gemini API interactions to ensure reliability and visibility.
 - **Intelligent Media Download:** Utilizes domain-specific rules and specialized headers (for Facebook, YouTube, MediaDelivery, etc.) via `yt-dlp` to ensure reliable content extraction.

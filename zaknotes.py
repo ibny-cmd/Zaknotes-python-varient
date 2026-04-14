@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 from src.cookie_manager import interactive_update as refresh_cookies
 from src.notion_config_manager import NotionConfigManager
 from src.notion_service import NotionService
+from src.rclone_config_manager import RcloneConfigManager
+from src.rclone_service import RcloneService
 from src.config_manager import ConfigManager
 from src.pipeline import ProcessingPipeline
 from src.cleanup_service import FileCleanupService
@@ -133,6 +135,55 @@ def manage_notion_settings():
                 curr_secret, _ = notion_manager.get_credentials()
                 notion_manager.set_credentials(curr_secret, val)
                 print("✅ Database ID updated.")
+        elif choice == '4':
+            break
+        else:
+            print("❌ Invalid choice.")
+
+def manage_rclone_settings():
+    config = ConfigManager()
+    rclone_manager = RcloneConfigManager()
+    
+    while True:
+        enabled = config.get("rclone_integration_enabled", False)
+        notion_enabled = config.get("notion_integration_enabled", False)
+        remote, path = rclone_manager.get_credentials()
+        
+        print("\n--- Manage Rclone Integration ---")
+        print(f"1. Integration Enabled: {'✅ Yes' if enabled else '❌ No'}")
+        print(f"2. Set Rclone Remote (Current: {remote if remote else '[Not Set]'})")
+        print(f"3. Set Remote Path (Current: {path if path else '[Not Set]'})")
+        print("4. Back to Main Menu")
+        
+        if enabled and notion_enabled:
+            print("\n⚠️  WARNING: Both Rclone and Notion integrations are enabled.")
+            print("   This will add extra steps and may slow down the note-generation process.")
+        
+        choice = input("Enter your choice (1-4): ").strip()
+        
+        if choice == '1':
+            new_state = not enabled
+            if new_state and notion_enabled:
+                print("\n⚠️  Note: Notion integration is already enabled.")
+                confirm = input("Enabling both may slow down the process. Continue? (y/n): ").lower().strip()
+                if confirm != 'y':
+                    continue
+            
+            config.set("rclone_integration_enabled", new_state)
+            config.save()
+            print(f"✅ Integration {'enabled' if new_state else 'disabled'}.")
+        elif choice == '2':
+            val = input("Enter Rclone Remote Name (e.g., 'gdrive'): ").strip()
+            if val:
+                _, curr_path = rclone_manager.get_credentials()
+                rclone_manager.set_credentials(val, curr_path)
+                print("✅ Rclone Remote updated.")
+        elif choice == '3':
+            val = input("Enter Remote Path (e.g., 'Zaknotes/Notes'): ").strip()
+            if val:
+                curr_remote, _ = rclone_manager.get_credentials()
+                rclone_manager.set_credentials(curr_remote, val)
+                print("✅ Remote Path updated.")
         elif choice == '4':
             break
         else:
@@ -437,15 +488,16 @@ def main_menu():
         print("1. Start Note Generation")
         print("2. Manage Gemini Accounts")
         print("3. Manage Notion Settings")
-        print("4. Configure Gemini Models")
-        print("5. Configure Audio Chunking")
-        print("6. Configure Browser User-Agent")
-        print("7. Cleanup Stranded Audio Chunks")
-        print("8. Refresh Cookies")
-        print("9. Exit")
+        print("4. Manage Rclone Settings")
+        print("5. Configure Gemini Models")
+        print("6. Configure Audio Chunking")
+        print("7. Configure Browser User-Agent")
+        print("8. Cleanup Stranded Audio Chunks")
+        print("9. Refresh Cookies")
+        print("10. Exit")
         print("------------------------------")
         
-        choice = input("Enter your choice (1-9): ").strip()
+        choice = input("Enter your choice (1-10): ").strip()
         
         if choice == '1':
             start_note_generation()
@@ -454,16 +506,18 @@ def main_menu():
         elif choice == '3':
             manage_notion_settings()
         elif choice == '4':
-            configure_gemini_models()
+            manage_rclone_settings()
         elif choice == '5':
-            configure_audio_chunking()
+            configure_gemini_models()
         elif choice == '6':
-            configure_user_agent()
+            configure_audio_chunking()
         elif choice == '7':
-            cleanup_stranded_chunks()
+            configure_user_agent()
         elif choice == '8':
-            refresh_cookies()
+            cleanup_stranded_chunks()
         elif choice == '9':
+            refresh_cookies()
+        elif choice == '10':
             print("Goodbye!")
             break
         else:

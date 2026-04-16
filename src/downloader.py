@@ -120,6 +120,20 @@ def download_audio(job):
         run_command(cmd)
         match_found = True
 
+    # 3. Vimeo (EdgeCourseBD vimeo_url directly)
+    elif "player.vimeo.com" in url:
+        print(">> Mode: Vimeo Url (Direct)")
+        cmd = base_cmd + ["-N", "16", "--no-part", "--no-keep-fragments", "--no-playlist"] + common_args + [
+            "-x", "--audio-format", "mp3",
+            "--add-header", "Referer: https://edgecoursebd.com/",
+            "--add-header", "Origin: https://edgecoursebd.com/",
+            "--add-header", f"User-Agent: {ua}",
+            url
+        ]
+        run_command(cmd)
+        match_found = True
+
+
     # 4. EDGECOURSEBD
     elif "edgecoursebd" in url:
         print(">> Mode: EdgeCourseBD (Running Scraper...)")
